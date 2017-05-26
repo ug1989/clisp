@@ -5,7 +5,7 @@
 
 #|
 var a = `
-<div class="_d aa bb xxxx" id='_d' data-aa="haha'haha">
+    <div class="_d aa bb xxxx" id='_d' data-aa="haha'haha">
 	<div class='_d1"' id="'_d1">
         aaa
         <span class='_s' id='_s'>
@@ -27,7 +27,8 @@ var a = `
         </span>
         aa
 	</div>
-</div>`;
+    </div>
+`;
 
 a.match(/<(div|span|i)((\s+[\w-]+)+(=((\"[\s\w\d\"\']*\")|(\'[\s\w\d\"\']*\'))))*>/g);
 |#
