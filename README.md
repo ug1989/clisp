@@ -1,6 +1,6 @@
 # clisp
 
-/* ······· */
+* /* ······· */
 
 var a = `
 <div class="_d aa bb xxxx" id='_d' data-aa="haha'haha">
@@ -30,3 +30,4 @@ var a = `
 a.match(/<(div|span|i)((\s+[\w-]+)+(=((\"[\s\w\d\"\']*\")|(\'[\s\w\d\"\']*\'))))*>/g);
 
 /* ······· */
+*
