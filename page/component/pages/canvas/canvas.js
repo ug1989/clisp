@@ -19,6 +19,7 @@ function draw(colors, _color, step) {
   let startAngle = 0 - (stepAngle / 2);
   let index = 0;
 
+  ctx.setLineWidth(strokeWidth)
   while (index < colors.length) {
     ctx.beginPath()
     ctx.setStrokeStyle(colors[index])
@@ -31,7 +32,6 @@ function draw(colors, _color, step) {
   ctx.beginPath()
   ctx.setStrokeStyle(_color)
   ctx.moveTo(center, center)
-  ctx.setLineWidth(strokeWidth)
   ctx.lineTo(center + Math.sin(arcAngle) * needleLength, center - Math.cos(arcAngle) * needleLength)
   ctx.stroke()
 }
@@ -59,7 +59,6 @@ Page({
   end: function (e) { },
   onLoad: function () {
     ctx = wx.createCanvasContext('myCanvas')
-    ctx.setLineWidth(strokeWidth)
     curColor = colors[0]
     const _this = this;
     setInterval(function () {
