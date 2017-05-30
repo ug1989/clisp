@@ -7,11 +7,13 @@ let speed = 1;
 const strokeWidth = 16;
 const colors = ['#88ff00', '#ff0088', '#0088ff', '#ff8800'];
 
-function drawOuter(colors) {
+function draw(colors, _color, step) {
   if (!ctx) return;
 
+  _angle = (_angle + (step * speed))
+  const needleLength = _width / 3.5
+  const arcAngle = _angle / 360 * Math.PI
   const radius = center * 0.75;
-
   const spaceAngle = 10 / 360;
   const stepAngle = (2 * Math.PI) / colors.length;
   let startAngle = 0 - (stepAngle / 2);
@@ -20,25 +22,15 @@ function drawOuter(colors) {
   while (index < colors.length) {
     ctx.beginPath()
     ctx.setStrokeStyle(colors[index])
-
     ctx.arc(center, center, radius, startAngle + spaceAngle, startAngle + stepAngle - spaceAngle)
-    startAngle += stepAngle; 
+    startAngle += stepAngle;
     index += 1;
     ctx.stroke();
   }
-}
 
-function drawInner(colors, _color, step) {
-  if (!ctx) return;
-
-  _angle = (_angle + (step * speed))
-  const needleLength = _width / 3.5
-  const stepAngle = 360 / colors.length;
-  const radius = center * 0.55;
-  const arcAngle = _angle / 360 * Math.PI
-
-  ctx.moveTo(center, center)
+  ctx.beginPath()
   ctx.setStrokeStyle(_color)
+  ctx.moveTo(center, center)
   ctx.setLineWidth(strokeWidth)
   ctx.lineTo(center + Math.sin(arcAngle) * needleLength, center - Math.cos(arcAngle) * needleLength)
   ctx.stroke()
@@ -68,16 +60,11 @@ Page({
   onLoad: function () {
     ctx = wx.createCanvasContext('myCanvas')
     ctx.setLineWidth(strokeWidth)
-    drawOuter(colors)
     curColor = colors[0]
     const _this = this;
     setInterval(function () {
-      // ctx.clearRect(0, 0, _width, _width);
-      curColor = '#' + ((parseInt(curColor.replace('#', '0x')) + 1) % 16777215).toString(16)
-      console.log(newColor)
-      drawInner(colors, curColor, _this.data.rStep)
-      
-      ctx.draw(true)
+      draw(colors, curColor, _this.data.rStep)
+      ctx.draw()
     }, 17);
   }
 })
