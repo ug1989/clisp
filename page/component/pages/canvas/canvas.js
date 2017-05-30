@@ -5,9 +5,8 @@ let _angle = 0;
 let curColor;
 let speed = 1;
 const strokeWidth = 16;
-const colors = ['#88ff00', '#ff0088', '#0088ff', '#ff8800', '#00ff88'];
+const colors = ['#88ff00', '#ff0088', '#0088ff', '#ff8800'];
 
-var t = 0;
 function drawOuter(colors) {
   if (!ctx) return;
 
@@ -17,8 +16,6 @@ function drawOuter(colors) {
   const stepAngle = (2 * Math.PI) / colors.length;
   let startAngle = 0 - (stepAngle / 2);
   let index = 0;
-
-  ctx.setLineWidth(strokeWidth);
 
   while (index < colors.length) {
     ctx.beginPath()
@@ -34,21 +31,17 @@ function drawOuter(colors) {
 function drawInner(colors, _color, step) {
   if (!ctx) return;
 
-  const rectWidth = _width / 3.5
+  _angle = (_angle + (step * speed))
+  const needleLength = _width / 3.5
   const stepAngle = 360 / colors.length;
+  const radius = center * 0.55;
+  const arcAngle = _angle / 360 * Math.PI
 
-  _angle = (_angle + (step * speed)) % 360
-  
-  ctx.translate(center, center)
-  ctx.rotate(_angle * Math.PI / 180)
-  ctx.setFillStyle(_color)
-  ctx.fillRect(0, - (strokeWidth / 2), rectWidth, strokeWidth)
-  ctx.rotate(-_angle * Math.PI / 180)
-  ctx.translate(-center, -center)
-    
-  // if (_color != colors[Math.floor((_angle + stepAngle / 2) % 360 / stepAngle)]) {
-  //   speed = 0
-  // }
+  ctx.moveTo(center, center)
+  ctx.setStrokeStyle(_color)
+  ctx.setLineWidth(strokeWidth)
+  ctx.lineTo(center + Math.sin(arcAngle) * needleLength, center - Math.cos(arcAngle) * needleLength)
+  ctx.stroke()
 }
 
 wx.getSystemInfo({
@@ -64,7 +57,8 @@ Page({
   },
   start: function (e) {
     curColor = colors[Math.floor(Math.random() * colors.length)]
-    // speed = 1;
+    speed = (speed + 1) % 5
+    console.log(speed);
     this.setData({
       rStep: this.data.rStep * -1
     })
@@ -73,13 +67,17 @@ Page({
   end: function (e) { },
   onLoad: function () {
     ctx = wx.createCanvasContext('myCanvas')
+    ctx.setLineWidth(strokeWidth)
+    drawOuter(colors)
     curColor = colors[0]
     const _this = this;
     setInterval(function () {
-      ctx.clearRect(0, 0, _width, _width);
-      drawOuter(colors)
+      // ctx.clearRect(0, 0, _width, _width);
+      curColor = '#' + ((parseInt(curColor.replace('#', '0x')) + 1) % 16777215).toString(16)
+      console.log(newColor)
       drawInner(colors, curColor, _this.data.rStep)
+      
       ctx.draw(true)
-    }, 16);
+    }, 17);
   }
 })
