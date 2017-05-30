@@ -1,0 +1,19 @@
+<import src="../../../common/head.wxml" />
+<import src="../../../common/foot.wxml" />
+
+<view class="container">
+  <!--<template is="head" data="{{title: 'canvas'}}"/>-->
+
+  <view class="page-body">
+    <canvas class="canvas" canvas-id="myCanvas"
+    style="margin: 0; border: none;"
+    bindtouchstart="start"
+    bindtouchmove="move"
+    bindtouchend="end"
+    disable-scroll="{{true}}" />
+  </view>
+
+  <!--<template is="foot" />-->
+</view>
+
+
