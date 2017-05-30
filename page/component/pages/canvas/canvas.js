@@ -3,7 +3,7 @@ let ctx;
 let center;
 let _angle = 0;
 let curColor;
-let speed = 1;
+let speed = 16;
 const strokeWidth = 16;
 const colors = ['#88ff00', '#ff0088', '#0088ff', '#ff8800'];
 
@@ -49,7 +49,7 @@ Page({
   },
   start: function (e) {
     curColor = colors[Math.floor(Math.random() * colors.length)]
-    speed = (speed + 1) % 5
+    speed = (speed - 1) % 17 || 16
     console.log(speed);
     this.setData({
       rStep: this.data.rStep * -1
