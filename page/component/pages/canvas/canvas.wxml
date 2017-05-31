@@ -11,6 +11,7 @@
     bindtouchmove="move"
     bindtouchend="end"
     disable-scroll="{{true}}" />
+    <button class="retry" bindtap="reset">reTry</button>
   </view>
 
   <!--<template is="foot" />-->

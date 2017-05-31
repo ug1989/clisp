@@ -3,14 +3,15 @@ let ctx;    // 画布操作对象
 let center; // 画布中心坐标
 let _angle = 0; // 当前旋转角度
 let curColor;   // 当前指针颜色
-let speed = 7;  // 当前旋转速度
+let speed = 6;  // 当前旋转速度
 let catchMatchColor; // 是否匹配对应颜色标记
-const strokeWidth = 12; // 绘图宽度
-// const colors = ['red', 'blue', 'yellow', 'Moccasin', 'Aquamarine', 'BlueViolet', 'DarkSeaGreen']
-const colors = ['red', 'blue', 'yellow', 'Moccasin'];
+const strokeWidth = 16; // 绘图宽度
+const colors = ['red', 'blue', 'yellow', 'Moccasin', 'Aquamarine', 'BlueViolet', 'DarkSeaGreen']
+// const colors = ['red', 'blue', 'yellow', 'Moccasin'];
 
 function draw(colors, _color, step) {
   if (!ctx) return;
+  ctx.setLineWidth(strokeWidth)
   const colorNum = colors.length;
   const arcAngle = _angle / 360 * Math.PI            // 旋转弧度
   const needleLength = _width / 3.5                  // 指针长度
@@ -24,7 +25,7 @@ function draw(colors, _color, step) {
   let matchIndex = Math.floor((arcAngle + stepAngle / 2) / stepAngle) % colorNum
   matchIndex = (matchIndex + colorNum) % colorNum;
   if (catchMatchColor && colors[matchIndex] != curColor) {
-    console.error('!!!!!');
+    // console.error('!!!!!');
     speed = 0;
   }
   catchMatchColor = colors[matchIndex] == curColor
@@ -82,11 +83,16 @@ Page({
   },
   move: function (e) { },
   end: function (e) { },
+  reset: function() {
+    _angle = 0
+    curColor = getNewColor(colors[0])
+    speed = 6
+    catchMatchColor = false
+  },
   onLoad: function () {
     const _this = this;
     curColor = getNewColor(colors[0])
     ctx = wx.createCanvasContext('myCanvas')
-    ctx.setLineWidth(strokeWidth)
     setInterval(function () {
       draw(colors, curColor, _this.data.rStep)
     }, 17);

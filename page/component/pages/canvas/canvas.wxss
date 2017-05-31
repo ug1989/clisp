@@ -4,3 +4,7 @@
   padding-bottom: 100%;
   background-color: #fff;
 }
+.retry {
+  width: 80%;
+  margin-left: 10%;
+}
