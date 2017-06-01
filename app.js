@@ -30,7 +30,7 @@ App({
             },
             success: function(res) {
               console.log('拉取openid成功', res)
-              self.globalData.openid = res.data.openid
+              self.globalData.openid = res.data && res.data.openid
               callback(null, self.globalData.openid)
             },
             fail: function(res) {

@@ -14,6 +14,10 @@
     <button class="retry" bindtap="reset">reTry</button>
   </view>
 
+  <view class="classname">
+    {{level}} : {{tapTimes}}
+  </view>
+
   <!--<template is="foot" />-->
 </view>
 

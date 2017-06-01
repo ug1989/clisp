@@ -1,15 +1,21 @@
+// 画图
 let _width; // 屏幕宽度
 let ctx;    // 画布操作对象
 let center; // 画布中心坐标
+const strokeWidth = 16; // 绘图宽度
+const allColors = ['red', 'blue', 'yellow', 'Moccasin', 'Aquamarine', 'BlueViolet', 'DarkSeaGreen', 'Indigo', 'Magenta', 'Plum', 'Violet']; // 可供选择的所有颜色
+allColors.length = 5;
+let colors = []; // 当前实际展示的颜色
+
+// 动画
 let _angle = 0; // 当前旋转角度
 let curColor;   // 当前指针颜色
 let speed = 6;  // 当前旋转速度
-let catchMatchColor; // 是否匹配对应颜色标记
-const strokeWidth = 16; // 绘图宽度
-const colors = ['red', 'blue', 'yellow', 'Moccasin', 'Aquamarine', 'BlueViolet', 'DarkSeaGreen']
-// const colors = ['red', 'blue', 'yellow', 'Moccasin'];
+let catchMatchColor; // 是否开始记录错失区域
+let levelUpLimit = 6; // 成功几次升级
 
-function draw(colors, _color, step) {
+// 游戏动画
+function draw(colors, matchColor, direction) {
   if (!ctx) return;
   ctx.setLineWidth(strokeWidth)
   const colorNum = colors.length;
@@ -17,18 +23,9 @@ function draw(colors, _color, step) {
   const needleLength = _width / 3.5                  // 指针长度
   const radius = center * 0.75;                      // 外圈半径
   const spaceAngle = 10 / 360;                       // 外圈间隔
-  const stepAngle = (2 * Math.PI) / colorNum;   // 外圈分布弧长
+  const stepAngle = (2 * Math.PI) / colorNum;        // 外圈分布弧长
   let startAngle = 0 - (stepAngle / 2);              // 起点x轴对称
   let index = 0;
-
-  // 是否开始拦截
-  let matchIndex = Math.floor((arcAngle + stepAngle / 2) / stepAngle) % colorNum
-  matchIndex = (matchIndex + colorNum) % colorNum;
-  if (catchMatchColor && colors[matchIndex] != curColor) {
-    // console.error('!!!!!');
-    speed = 0;
-  }
-  catchMatchColor = colors[matchIndex] == curColor
 
   // 画外圈
   while (index < colorNum) {
@@ -42,13 +39,26 @@ function draw(colors, _color, step) {
 
   // 内部指针
   ctx.beginPath()
-  ctx.setStrokeStyle(_color)
+  ctx.setStrokeStyle(matchColor)
   ctx.moveTo(center, center)
   ctx.lineTo(center + Math.cos(arcAngle) * needleLength, center + Math.sin(arcAngle) * needleLength)
   ctx.stroke()
   ctx.draw()
 
-  _angle = (_angle + (step * speed))                 // 更新旋转角度
+  // 计算当前位置对应外圈位置
+  let matchIndex = Math.floor((arcAngle + stepAngle / 2) / stepAngle) % colorNum
+  matchIndex = (matchIndex + colorNum) % colorNum;
+
+  // 错过匹配颜色范围，停止
+  if (catchMatchColor && colors[matchIndex] != curColor) {
+    speed = 0
+  }
+
+  // 当旋转到同色区域，开始捕获
+  catchMatchColor = colors[matchIndex] == curColor
+
+  // 旋转角递增
+  _angle = (_angle + (direction * speed))                 // 更新旋转角度
 }
 
 function getNewColor(curColor) {
@@ -70,31 +80,53 @@ wx.getSystemInfo({
 // 定义页面内容
 Page({
   data: {
-    rStep: 1
+    direction: 1,
+    level: 1,
+    tapTimes: 0
   },
   start: function (e) {
+    if (!speed) return;
+    if (!catchMatchColor) {
+      speed = 0;
+      return;
+    }
     curColor = getNewColor(curColor);
     catchMatchColor = false;
     // speed = (speed - 1) % 17 || 16
-    console.log(speed);
+    if (this.data.tapTimes == levelUpLimit && this.data.level < allColors.length - 2) {
+      this.data.level += 1
+      this.data.tapTimes = 0
+      colors = allColors.slice(0, this.data.level + 2)
+      curColor = getNewColor(colors[0])
+    } else {
+      this.data.tapTimes += 1
+    }
     this.setData({
-      rStep: this.data.rStep * -1 // 改变旋转方向
+      direction: this.data.direction * -1, // 改变旋转方向
+      tapTimes: this.data.tapTimes,
+      level: this.data.level
     })
   },
   move: function (e) { },
   end: function (e) { },
   reset: function() {
     _angle = 0
-    curColor = getNewColor(colors[0])
     speed = 6
     catchMatchColor = false
+    colors = allColors.slice(0, 3)
+    curColor = getNewColor(colors[0])
+    this.setData({
+      direction: 1,
+      tapTimes: 0,
+      level: 1
+    })
   },
   onLoad: function () {
     const _this = this;
-    curColor = getNewColor(colors[0])
     ctx = wx.createCanvasContext('myCanvas')
+    this.reset()
     setInterval(function () {
-      draw(colors, curColor, _this.data.rStep)
+      draw(colors, curColor, _this.data.direction)
     }, 17);
   }
 })
