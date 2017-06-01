@@ -4,7 +4,7 @@ let ctx;    // 画布操作对象
 let center; // 画布中心坐标
 const strokeWidth = 16; // 绘图宽度
 const allColors = ['red', 'blue', 'yellow', 'Moccasin', 'Aquamarine', 'BlueViolet', 'DarkSeaGreen', 'Indigo', 'Magenta', 'Plum', 'Violet']; // 可供选择的所有颜色
-allColors.length = 5;
+// allColors.length = 5;
 let colors = []; // 当前实际展示的颜色
 
 // 动画
@@ -12,7 +12,7 @@ let _angle = 0; // 当前旋转角度
 let curColor;   // 当前指针颜色
 let speed = 6;  // 当前旋转速度
 let catchMatchColor; // 是否开始记录错失区域
-let levelUpLimit = 6; // 成功几次升级
+let levelUpLimit = 3; // 成功 n+1 次升级
 
 // 游戏动画
 function draw(colors, matchColor, direction) {
@@ -94,10 +94,16 @@ Page({
     catchMatchColor = false;
     // speed = (speed - 1) % 17 || 16
     if (this.data.tapTimes == levelUpLimit && this.data.level < allColors.length - 2) {
-      this.data.level += 1
-      this.data.tapTimes = 0
-      colors = allColors.slice(0, this.data.level + 2)
-      curColor = getNewColor(colors[0])
+      this.data.level += 1;
+      this.data.tapTimes = 0;
+      // 避免切换到同色
+      const colorNum = this.data.level + 2;
+      const arcAngle = _angle / 360 * Math.PI
+      const stepAngle = (2 * Math.PI) / colorNum;
+      colors = allColors.slice(0, colorNum);
+      const matchIndex = ((Math.floor((arcAngle + stepAngle / 2) / stepAngle) % colorNum) + colorNum) % colorNum;
+      curColor = getNewColor(colors[matchIndex]);
+      // console.log(colors[matchIndex], curColor);
     } else {
       this.data.tapTimes += 1
     }
@@ -125,8 +131,12 @@ Page({
     const _this = this;
     ctx = wx.createCanvasContext('myCanvas')
     this.reset()
-    setInterval(function () {
+    this.runDraw = setInterval(function () {
       draw(colors, curColor, _this.data.direction)
     }, 17);
+  },
+  onUnload: function() {
+    ctx = null;
+    clearInterval(this.runDraw);
   }
 })
