@@ -2,15 +2,17 @@
 let _width; // 屏幕宽度
 let ctx;    // 画布操作对象
 let center; // 画布中心坐标
-const strokeWidth = 16; // 绘图宽度
-const allColors = ['red', 'blue', 'yellow', 'Moccasin', 'Aquamarine', 'BlueViolet', 'DarkSeaGreen', 'Indigo', 'Magenta', 'Plum', 'Violet']; // 可供选择的所有颜色
+const strokeWidth = 10; // 绘图宽度
+const allColors = "Tomato,Turquoise,SteelBlue,Yellow,Aqua,Bisque,BlueViolet,Brown,CadetBlue,Chartreuse,Chocolate,CornflowerBlue,Crimson,Cyan,DarkCyan,DarkGoldenRod,DarkGreen,DarkMagenta,DarkOliveGreen,DarkOrange,DeepPink,DodgerBlue,ForestGreen,Gold,GoldenRod,GreenYellow,LightSalmon,LightSeaGreen,MediumSeaGreen,MediumSpringGreen,MediumSlateBlue,NavajoWhite,Orange,OrangeRed,OliveDrab,PaleGreen,Peru,Purple,PaleVioletRed,RoyalBlue,Salmon,SeaGreen,SandyBrown,SlateBlue,YellowGreen".split(','); // 可供选择的所有颜色
 // allColors.length = 5;
 let colors = []; // 当前实际展示的颜色
+const bgColor = '#ffffff';
+const sizeScale = 0.7;
 
 // 动画
 let _angle = 0; // 当前旋转角度
 let curColor;   // 当前指针颜色
-let speed = 6;  // 当前旋转速度
+let speed = 8;  // 当前旋转速度
 let catchMatchColor; // 是否开始记录错失区域
 let levelUpLimit = 3; // 成功 n+1 次升级
 
@@ -20,18 +22,24 @@ function draw(colors, matchColor, direction) {
   ctx.setLineWidth(strokeWidth)
   const colorNum = colors.length;
   const arcAngle = _angle / 360 * Math.PI            // 旋转弧度
-  const needleLength = _width / 3.5                  // 指针长度
-  const radius = center * 0.75;                      // 外圈半径
+  const radius = center * sizeScale;                 // 外圈半径
+  const needleLength = radius * 3 / 4;                    // 指针长度
   const spaceAngle = 10 / 360;                       // 外圈间隔
   const stepAngle = (2 * Math.PI) / colorNum;        // 外圈分布弧长
   let startAngle = 0 - (stepAngle / 2);              // 起点x轴对称
   let index = 0;
 
+  // 背景圈
+  ctx.beginPath()
+  ctx.setFillStyle(bgColor)
+  ctx.arc(center, center, radius, 0, Math.PI * 2)
+  ctx.fill();
+
   // 画外圈
   while (index < colorNum) {
     ctx.beginPath()
     ctx.setStrokeStyle(colors[index])
-    ctx.arc(center, center, radius, startAngle + spaceAngle, startAngle + stepAngle - spaceAngle)
+    ctx.arc(center, center, radius * 6 / 7, startAngle + spaceAngle, startAngle + stepAngle - spaceAngle)
     startAngle += stepAngle;
     index += 1;
     ctx.stroke();
