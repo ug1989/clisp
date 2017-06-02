@@ -3,7 +3,7 @@ let _width; // 屏幕宽度
 let ctx;    // 画布操作对象
 let center; // 画布中心坐标
 const strokeWidth = 10; // 绘图宽度
-const allColors = "Tomato,Turquoise,SteelBlue,Yellow,Aqua,Bisque,BlueViolet,Brown,CadetBlue,Chartreuse,Chocolate,CornflowerBlue,Crimson,Cyan,DarkCyan,DarkGoldenRod,DarkGreen,DarkMagenta,DarkOliveGreen,DarkOrange,DeepPink,DodgerBlue,ForestGreen,Gold,GoldenRod,GreenYellow,LightSalmon,LightSeaGreen,MediumSeaGreen,MediumSpringGreen,MediumSlateBlue,NavajoWhite,Orange,OrangeRed,OliveDrab,PaleGreen,Peru,Purple,PaleVioletRed,RoyalBlue,Salmon,SeaGreen,SandyBrown,SlateBlue,YellowGreen".split(','); // 可供选择的所有颜色
+const allColors = "Tomato,Turquoise,SteelBlue,Yellow,BlueViolet,Chocolate,CornflowerBlue,Crimson,DarkCyan,DarkMagenta,DarkOrange,DeepPink,DodgerBlue,ForestGreen,Gold,GreenYellow,LightSalmon,LightSeaGreen,MediumSlateBlue,Orange,OrangeRed,OliveDrab,Purple,PaleVioletRed,RoyalBlue,Salmon,SeaGreen,SlateBlue,YellowGreen".split(','); // 可供选择的所有颜色
 // allColors.length = 5;
 let colors = []; // 当前实际展示的颜色
 const bgColor = '#ffffff';
@@ -12,7 +12,7 @@ const sizeScale = 0.7;
 // 动画
 let _angle = 0; // 当前旋转角度
 let curColor;   // 当前指针颜色
-let speed = 8;  // 当前旋转速度
+let speed = 0;  // 当前旋转速度
 let catchMatchColor; // 是否开始记录错失区域
 let levelUpLimit = 3; // 成功 n+1 次升级
 
@@ -125,7 +125,7 @@ Page({
   end: function (e) { },
   reset: function() {
     _angle = 0
-    speed = 6
+    speed = 8
     catchMatchColor = false
     colors = allColors.slice(0, 3)
     curColor = getNewColor(colors[0])
@@ -138,7 +138,7 @@ Page({
   onLoad: function () {
     const _this = this;
     ctx = wx.createCanvasContext('myCanvas')
-    this.reset()
+    colors = allColors;
     this.runDraw = setInterval(function () {
       draw(colors, curColor, _this.data.direction)
     }, 17);
