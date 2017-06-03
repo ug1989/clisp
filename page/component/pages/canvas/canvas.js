@@ -16,7 +16,8 @@ let speed = 0;  // 当前旋转速度
 let catchMatchColor; // 是否开始记录错失区域
 let levelUpLimit = 3; // 成功 n+1 次升级
 let direction = 1; // 旋转方向 1 顺时针 -1 逆时针
-const initSpeed = 8;
+const initSpeed = 7;
+const drawTimeStop = 16.666;
 
 // 游戏数据
 const actionData = [];
@@ -94,7 +95,7 @@ function getNewColor(curColor) {
 
 function startGame() {
   gameStartTime = +new Date;
-  drawAnimation = setInterval(draw, 16.666);
+  drawAnimation = setInterval(draw, drawTimeStop);
 }
 
 function endGame() {
@@ -192,7 +193,7 @@ Page({
   playShow() {
     if (actionData.length < 2) return;
     // 重置动画变量
-    speed = 1 || initSpeed;
+    speed = initSpeed;
     _angle = 0;
     direction = 1;
     catchMatchColor = false;
@@ -215,7 +216,7 @@ Page({
         speed = 0;
         clearInterval(mockPlay);
       }
-    }, 16.666);
+    }, drawTimeStop);
   },
   onLoad: function () {
     ctx = wx.createCanvasContext('myCanvas')
