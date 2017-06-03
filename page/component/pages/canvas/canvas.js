@@ -20,6 +20,7 @@ const initSpeed = 8;
 
 // 游戏数据
 const actionData = [];
+let gameStartTime, gameEndTime;
 
 // 游戏动画
 function draw() {
@@ -28,14 +29,13 @@ function draw() {
   const colorNum = colors.length;
   const arcAngle = _angle / 360 * Math.PI            // 旋转弧度
   const radius = center * radiusScale;                 // 外圈半径
-  const needleLength = radius * 0.7;               // 指针长度
-  const spaceAngle = 30 / 360;                       // 外圈间隔
+  const needleLength = radius * 3 / 4;               // 指针长度
+  const spaceAngle = 10 / 360;                       // 外圈间隔
   const stepAngle = (2 * Math.PI) / colorNum;        // 外圈分布弧长
   let startAngle = 0 - (stepAngle / 2);              // 起点x轴对称
 
   // 设置绘图宽度
   ctx.setLineWidth(strokeWidth)
-  ctx.setLineCap('round')
 
   // 背景圈
   ctx.beginPath()
@@ -93,10 +93,15 @@ function getNewColor(curColor) {
 }
 
 function startGame() {
+  gameStartTime = +new Date;
   drawAnimation = setInterval(draw, 17);
 }
 
 function endGame() {
+  if (gameStartTime) {
+    console.log(+new Date - gameStartTime);
+    gameStartTime = 0;
+  }
   clearInterval(drawAnimation)
 }
 
