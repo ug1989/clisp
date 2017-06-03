@@ -16,6 +16,7 @@ let speed = 0;  // 当前旋转速度
 let catchMatchColor; // 是否开始记录错失区域
 let levelUpLimit = 3; // 成功 n+1 次升级
 let direction = 1; // 旋转方向 1 顺时针 -1 逆时针
+const initSpeed = 8;
 
 // 游戏数据
 const actionData = [];
@@ -161,7 +162,7 @@ Page({
   },
   newGame: function() {
     // 重置动画变量
-    speed = 7;
+    speed = initSpeed;
     _angle = 0;
     direction = 1;
     catchMatchColor = false;
@@ -185,7 +186,7 @@ Page({
   playShow() {
     if (!actionData.length) return;
     // 重置动画变量
-    speed = 7;
+    speed = initSpeed;
     _angle = 0;
     direction = 1;
     catchMatchColor = false;
