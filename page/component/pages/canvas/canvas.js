@@ -94,7 +94,7 @@ function getNewColor(curColor) {
 
 function startGame() {
   gameStartTime = +new Date;
-  drawAnimation = setInterval(draw, 17);
+  drawAnimation = setInterval(draw, 16.666);
 }
 
 function endGame() {
@@ -215,7 +215,7 @@ Page({
         speed = 0;
         clearInterval(mockPlay);
       }
-    }, 17);
+    }, 16.666);
   },
   onLoad: function () {
     ctx = wx.createCanvasContext('myCanvas')
