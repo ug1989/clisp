@@ -3,7 +3,7 @@ let _width; // 屏幕宽度
 let ctx;    // 画布操作对象
 let center; // 画布中心坐标
 const strokeWidth = 10; // 绘图宽度
-const allColors = "Tomato,Turquoise,SteelBlue,Yellow,BlueViolet,Chocolate,CornflowerBlue,Crimson,DarkCyan,DarkMagenta,DarkOrange,DeepPink,DodgerBlue,ForestGreen,Gold,PaleVioletRed,RoyalBlue,YellowGreen".split(','); // 可供选择的所有颜色
+const allColors = "Tomato,Turquoise,SteelBlue,Gold,BlueViolet,Chocolate,CornflowerBlue,Crimson,DarkCyan,DarkMagenta,DarkOrange,DeepPink,DodgerBlue,ForestGreen,Gold,PaleVioletRed,RoyalBlue,YellowGreen".split(','); // 可供选择的所有颜色
 let colors = []; // 当前实际展示的颜色
 const bgColor = '#ffffff';
 const radiusScale = 0.7;
