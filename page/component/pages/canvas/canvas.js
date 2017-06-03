@@ -190,9 +190,9 @@ Page({
     startGame();
   },
   playShow() {
-    if (!actionData.length) return;
+    if (actionData.length < 2) return;
     // 重置动画变量
-    speed = initSpeed;
+    speed = 1 || initSpeed;
     _angle = 0;
     direction = 1;
     catchMatchColor = false;
