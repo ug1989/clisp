@@ -4,7 +4,6 @@ let ctx;    // 画布操作对象
 let center; // 画布中心坐标
 const strokeWidth = 10; // 绘图宽度
 const allColors = "Tomato,Turquoise,SteelBlue,Yellow,BlueViolet,Chocolate,CornflowerBlue,Crimson,DarkCyan,DarkMagenta,DarkOrange,DeepPink,DodgerBlue,ForestGreen,Gold,PaleVioletRed,RoyalBlue,YellowGreen".split(','); // 可供选择的所有颜色
-// allColors.length = 5;
 let colors = []; // 当前实际展示的颜色
 const bgColor = '#ffffff';
 const radiusScale = 0.7;
@@ -75,6 +74,10 @@ function draw() {
   
   // 停止动画
   if (!speed) {
+    actionData.push({
+      _angle: _angle,
+      stop: true
+    });
     endGame();
   };
 }
@@ -118,15 +121,10 @@ Page({
   move: function (e) { },
   end: function (e) { },
   reverse: function() {
-    if (!speed) {
-      return;
-    }
+    if (!speed) return;
 
     // 非反转区域
-    if (!catchMatchColor) {
-      speed = 0;
-      return;
-    }
+    if (!catchMatchColor) return speed = 0;
 
     // 可以反向，重置部分变量
     catchMatchColor = false;
@@ -163,7 +161,7 @@ Page({
   },
   newGame: function() {
     // 重置动画变量
-    speed = 8;
+    speed = 7;
     _angle = 0;
     direction = 1;
     catchMatchColor = false;
@@ -181,12 +179,13 @@ Page({
       curColor: curColor,
       _angle: _angle
     });
+    endGame();
     startGame();
   },
   playShow() {
     if (!actionData.length) return;
     // 重置动画变量
-    speed = 8;
+    speed = 7;
     _angle = 0;
     direction = 1;
     catchMatchColor = false;
@@ -194,15 +193,21 @@ Page({
     curColor = actionData[0].curColor;
     startGame();
     let mockIndex = 1;
-    const mockPlay = setInterval(function() {
-      if (actionData[mockIndex] && _angle == actionData[mockIndex]._angle) {
+    let mockPlay = setInterval(function () {
+      const stopMock = actionData[mockIndex].stop;
+      const matchAngle = _angle == actionData[mockIndex]._angle;
+      
+      if (actionData[mockIndex] && matchAngle && !stopMock) {
         direction *= -1;
         catchMatchColor = false;
         colors = actionData[mockIndex].colors;
         curColor = actionData[mockIndex].curColor;
         mockIndex += 1;
       }
-      if (speed == 0) clearInterval(mockPlay);
+      if (speed == 0 || matchAngle && stopMock) {
+        speed = 0;
+        clearInterval(mockPlay);
+      }
     }, 17);
   },
   onLoad: function () {
