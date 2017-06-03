@@ -11,7 +11,8 @@
     bindtouchmove="move"
     bindtouchend="end"
     disable-scroll="{{true}}" />
-    <button class="retry" bindtap="reset">reTry</button>
+    <button class="retry" bindtap="newGame">New Game</button>
+    <button class="retry" bindtap="playShow">Show Game</button>
   </view>
 
   <view class="classname">

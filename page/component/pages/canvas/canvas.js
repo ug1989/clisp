@@ -1,4 +1,4 @@
-// 画图
+// 界面颜色及尺寸
 let _width; // 屏幕宽度
 let ctx;    // 画布操作对象
 let center; // 画布中心坐标
@@ -7,27 +7,34 @@ const allColors = "Tomato,Turquoise,SteelBlue,Yellow,BlueViolet,Chocolate,Cornfl
 // allColors.length = 5;
 let colors = []; // 当前实际展示的颜色
 const bgColor = '#ffffff';
-const sizeScale = 0.7;
+const radiusScale = 0.7;
 
-// 动画
+// 动画相关变量
+let drawAnimation; // 动画定时器
 let _angle = 0; // 当前旋转角度
 let curColor;   // 当前指针颜色
 let speed = 0;  // 当前旋转速度
 let catchMatchColor; // 是否开始记录错失区域
 let levelUpLimit = 3; // 成功 n+1 次升级
+let direction = 1; // 旋转方向 1 顺时针 -1 逆时针
+
+// 游戏数据
+const actionData = [];
 
 // 游戏动画
-function draw(colors, matchColor, direction) {
+function draw() {
   if (!ctx) return;
-  ctx.setLineWidth(strokeWidth)
+  
   const colorNum = colors.length;
   const arcAngle = _angle / 360 * Math.PI            // 旋转弧度
-  const radius = center * sizeScale;                 // 外圈半径
-  const needleLength = radius * 3 / 4;                    // 指针长度
+  const radius = center * radiusScale;                 // 外圈半径
+  const needleLength = radius * 3 / 4;               // 指针长度
   const spaceAngle = 10 / 360;                       // 外圈间隔
   const stepAngle = (2 * Math.PI) / colorNum;        // 外圈分布弧长
   let startAngle = 0 - (stepAngle / 2);              // 起点x轴对称
-  let index = 0;
+
+  // 设置绘图宽度
+  ctx.setLineWidth(strokeWidth)
 
   // 背景圈
   ctx.beginPath()
@@ -36,6 +43,7 @@ function draw(colors, matchColor, direction) {
   ctx.fill();
 
   // 画外圈
+  let index = 0;
   while (index < colorNum) {
     ctx.beginPath()
     ctx.setStrokeStyle(colors[index])
@@ -47,26 +55,28 @@ function draw(colors, matchColor, direction) {
 
   // 内部指针
   ctx.beginPath()
-  ctx.setStrokeStyle(matchColor)
+  ctx.setStrokeStyle(curColor)
   ctx.moveTo(center, center)
   ctx.lineTo(center + Math.cos(arcAngle) * needleLength, center + Math.sin(arcAngle) * needleLength)
   ctx.stroke()
   ctx.draw()
 
-  // 计算当前位置对应外圈位置
-  let matchIndex = Math.floor((arcAngle + stepAngle / 2) / stepAngle) % colorNum
-  matchIndex = (matchIndex + colorNum) % colorNum;
+  // 计算当前指针位置对应外圈颜色序号
+  let matchIndex = (Math.floor((arcAngle + stepAngle / 2) / stepAngle) % colorNum + colorNum) % colorNum;
 
-  // 错过匹配颜色范围，停止
-  if (catchMatchColor && colors[matchIndex] != curColor) {
-    speed = 0
-  }
+  // 错过匹配颜色范围，停止转动
+  if (catchMatchColor && colors[matchIndex] != curColor) speed = 0;
 
   // 当旋转到同色区域，开始捕获
   catchMatchColor = colors[matchIndex] == curColor
 
   // 旋转角递增
-  _angle = (_angle + (direction * speed))                 // 更新旋转角度
+  _angle = (_angle + (direction * speed))
+  
+  // 停止动画
+  if (!speed) {
+    endGame();
+  };
 }
 
 function getNewColor(curColor) {
@@ -75,6 +85,14 @@ function getNewColor(curColor) {
     return getNewColor(curColor);
   }
   return newColor;
+}
+
+function startGame() {
+  drawAnimation = setInterval(draw, 17);
+}
+
+function endGame() {
+  clearInterval(drawAnimation)
 }
 
 // 获取屏幕宽度
@@ -88,63 +106,110 @@ wx.getSystemInfo({
 // 定义页面内容
 Page({
   data: {
-    direction: 1,
     level: 1,
     tapTimes: 0
   },
-  start: function (e) {
-    if (!speed) return;
+  start: function (e) { 
+    const touchPoint = e.touches[0];
+    const distance = Math.sqrt((center - touchPoint.x) * (center - touchPoint.x) + (center - touchPoint.y) * (center - touchPoint.y));
+    // 点击在圆圈内有效
+    distance < center * radiusScale && this.reverse();
+  },
+  move: function (e) { },
+  end: function (e) { },
+  reverse: function() {
+    if (!speed) {
+      return;
+    }
+
+    // 非反转区域
     if (!catchMatchColor) {
       speed = 0;
       return;
     }
-    curColor = getNewColor(curColor);
+
+    // 可以反向，重置部分变量
     catchMatchColor = false;
-    // speed = (speed - 1) % 17 || 16
+    curColor = getNewColor(curColor);
+
+    // 达到升级次数设置升级，如果所有颜色都已经展示，无限计数点击次数
     if (this.data.tapTimes == levelUpLimit && this.data.level < allColors.length - 2) {
       this.data.level += 1;
       this.data.tapTimes = 0;
-      // 避免切换到同色
-      const colorNum = this.data.level + 2;
-      const arcAngle = _angle / 360 * Math.PI
-      const stepAngle = (2 * Math.PI) / colorNum;
-      colors = allColors.slice(0, colorNum);
-      const matchIndex = ((Math.floor((arcAngle + stepAngle / 2) / stepAngle) % colorNum) + colorNum) % colorNum;
-      curColor = getNewColor(colors[matchIndex]);
-      // console.log(colors[matchIndex], curColor);
     } else {
       this.data.tapTimes += 1
     }
+
+    // 升级增加外圈颜色，避免切换到同色
+    if (this.data.tapTimes == 0) {
+      const colorNum = this.data.level + 2;
+      colors = allColors.slice(0, colorNum);
+      const arcAngle = _angle / 360 * Math.PI
+      const stepAngle = (2 * Math.PI) / colorNum;
+      const matchIndex = ((Math.floor((arcAngle + stepAngle / 2) / stepAngle) % colorNum) + colorNum) % colorNum;
+      curColor = getNewColor(colors[matchIndex]); // 排除指针在当前角度指向的新颜色
+    }
+    direction = direction * -1; // 改变旋转方向
     this.setData({
-      direction: this.data.direction * -1, // 改变旋转方向
       tapTimes: this.data.tapTimes,
       level: this.data.level
-    })
+    });
+    // 记录游戏数据
+    actionData.push({
+      colors: JSON.parse(JSON.stringify(colors)),
+      curColor: curColor,
+      _angle: _angle
+    });
   },
-  move: function (e) { },
-  end: function (e) { },
-  reset: function() {
-    _angle = 0
-    speed = 8
-    catchMatchColor = false
-    colors = allColors.slice(0, 3)
-    curColor = getNewColor(colors[0])
+  newGame: function() {
+    // 重置动画变量
+    speed = 8;
+    _angle = 0;
+    direction = 1;
+    catchMatchColor = false;
+    colors = allColors.slice(0, 3);
+    curColor = getNewColor(colors[0]);
+    // 设置显示数据
     this.setData({
-      direction: 1,
       tapTimes: 0,
       level: 1
-    })
+    });
+    // 记录游戏数据
+    actionData.length = 0;
+    actionData.push({
+      colors: JSON.parse(JSON.stringify(colors)),
+      curColor: curColor,
+      _angle: _angle
+    });
+    startGame();
+  },
+  playShow() {
+    if (!actionData.length) return;
+    // 重置动画变量
+    speed = 8;
+    _angle = 0;
+    direction = 1;
+    catchMatchColor = false;
+    colors = actionData[0].colors;
+    curColor = actionData[0].curColor;
+    startGame();
+    let mockIndex = 1;
+    const mockPlay = setInterval(function() {
+      if (actionData[mockIndex] && _angle == actionData[mockIndex]._angle) {
+        direction *= -1;
+        catchMatchColor = false;
+        colors = actionData[mockIndex].colors;
+        curColor = actionData[mockIndex].curColor;
+        mockIndex += 1;
+      }
+      if (speed == 0) clearInterval(mockPlay);
+    }, 17);
   },
   onLoad: function () {
-    const _this = this;
     ctx = wx.createCanvasContext('myCanvas')
-    colors = allColors;
-    this.runDraw = setInterval(function () {
-      draw(colors, curColor, _this.data.direction)
-    }, 17);
   },
   onUnload: function() {
     ctx = null;
-    clearInterval(this.runDraw);
+    endGame();
   }
 })
