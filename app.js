@@ -1,8 +1,20 @@
-const openIdUrl = require('./config').openIdUrl
+const wxLoginUrl = 'https://bala.so/wxapp/login'
 
 App({
   onLaunch: function () {
-    console.log('App Launch')
+    this.wxLogin();
+    return;
+    const _this = this
+    const userId = wx.getStorageSync('userId')
+    userId && wx.checkSession({
+      success: function (res) {
+        _this.globalData.userId = userId
+      },
+      fail: function(res) {
+        _this.wxLogin()
+      }
+    }) 
+    !userId && _this.wxLogin()
   },
   onShow: function () {
     console.log('App Show')
@@ -10,40 +22,39 @@ App({
   onHide: function () {
     console.log('App Hide')
   },
+  wxLogin: function () {
+    const _this = this
+    wx.login({
+      success: function (res) {
+        res.code && wx.request({
+          url: wxLoginUrl,
+          data: {
+            code: res.code
+          },
+          success: function (res) {
+            const userId = res.data && res.data.userId
+            wx.setStorageSync('userId', userId)
+            _this.globalData.userId = userId
+            wx.getUserInfo({
+              withCredentials: true,
+              success: function (res) {
+                console.log(res)
+              }
+            })
+          }
+        })
+      },
+      fail: function (res) {
+        wx.showModal({
+          content: "　　获取登录信息失败，部分功能可能受限，重新授权登录可以删除小程序重新打开。",
+          showCancel: false,
+          confirmText: "确定"
+        })
+      }
+    })
+  },
   globalData: {
     hasLogin: false,
-    openid: null
-  },
-  // lazy loading openid
-  getUserOpenId: function(callback) {
-    var self = this
-
-    if (self.globalData.openid) {
-      callback(null, self.globalData.openid)
-    } else {
-      wx.login({
-        success: function(data) {
-          wx.request({
-            url: openIdUrl,
-            data: {
-              code: data.code
-            },
-            success: function(res) {
-              console.log('拉取openid成功', res)
-              self.globalData.openid = res.data && res.data.openid
-              callback(null, self.globalData.openid)
-            },
-            fail: function(res) {
-              console.log('拉取用户openid失败，将无法正常使用开放接口等服务', res)
-              callback(res)
-            }
-          })
-        },
-        fail: function(err) {
-          console.log('wx.login 接口调用失败，将无法正常使用开放接口等服务', err)
-          callback(err)
-        }
-      })
-    }
+    userId: null
   }
 })
