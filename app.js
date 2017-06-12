@@ -1,44 +1,56 @@
-const wxLoginUrl = 'https://bala.so/wxapp/login'
+const wxLogin = 'https://bala.so/wxapp/login'
+const checkLogin = 'https://bala.so/wxapp/loginCheck'
 
 App({
   onLaunch: function () {
-    this.wxLogin();
-    return;
     const _this = this
-    const userId = wx.getStorageSync('userId')
-    userId && wx.checkSession({
+    const user = wx.getStorageSync('user')
+    // this.wxLogin();
+    // return;
+    user ? wx.checkSession({
       success: function (res) {
-        _this.globalData.userId = userId
+        _this.globalData.user = user
       },
       fail: function(res) {
         _this.wxLogin()
       }
-    }) 
-    !userId && _this.wxLogin()
+    }) : _this.wxLogin()
   },
   onShow: function () {
-    console.log('App Show')
+    // console.log('App Show')
   },
   onHide: function () {
-    console.log('App Hide')
+    // console.log('App Hide')
   },
   wxLogin: function () {
     const _this = this
     wx.login({
       success: function (res) {
         res.code && wx.request({
-          url: wxLoginUrl,
+          url: wxLogin,
           data: {
             code: res.code
           },
           success: function (res) {
             const userId = res.data && res.data.userId
-            wx.setStorageSync('userId', userId)
-            _this.globalData.userId = userId
-            wx.getUserInfo({
-              withCredentials: true,
+            // update userInfo on server
+            userId && wx.getUserInfo({
               success: function (res) {
-                console.log(res)
+                wx.request({
+                  url: checkLogin,
+                  data: {
+                    userId: userId,
+                    rawData: res.rawData,
+                    signature: res.signature
+                  },
+                  method: 'POST',
+                  success: function (res) {
+                    if (res.data) {
+                      wx.setStorageSync('user', res.data)
+                      _this.globalData.user = res.data
+                    }
+                  }
+                })
               }
             })
           }
@@ -55,6 +67,6 @@ App({
   },
   globalData: {
     hasLogin: false,
-    userId: null
+    user: null
   }
 })

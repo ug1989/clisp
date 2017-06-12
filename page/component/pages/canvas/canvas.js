@@ -21,7 +21,9 @@ const drawTimeStop = 16.666;
 
 // 游戏数据
 const actionData = [];
-let gameStartTime, gameEndTime;
+let gameStartTime;
+let gameEndTime;
+let mockPlaying;
 
 // 游戏动画
 function draw() {
@@ -103,6 +105,7 @@ function endGame() {
     console.log(+new Date - gameStartTime);
     gameStartTime = 0;
   }
+  mockPlaying = false;
   clearInterval(drawAnimation)
 }
 
@@ -120,11 +123,12 @@ Page({
     level: 1,
     tapTimes: 0
   },
-  start: function (e) { 
-    const touchPoint = e.touches[0];
-    const distance = Math.sqrt((center - touchPoint.x) * (center - touchPoint.x) + (center - touchPoint.y) * (center - touchPoint.y));
-    // 点击在圆圈内有效
-    distance < center * radiusScale && this.reverse();
+  start: function (e) {
+    if (mockPlaying) return; // 重现游戏中
+    // const touchPoint = e.touches[0];
+    // const distance = Math.sqrt((center - touchPoint.x) * (center - touchPoint.x) + (center - touchPoint.y) * (center - touchPoint.y));
+    // distance < center * radiusScale && this.reverse(); // 点击在圆圈内有效
+    this.reverse();
   },
   move: function (e) { },
   end: function (e) { },
@@ -175,6 +179,7 @@ Page({
     catchMatchColor = false;
     colors = allColors.slice(0, 3);
     curColor = getNewColor(colors[0]);
+    mockPlaying = false;
     // 设置显示数据
     this.setData({
       tapTimes: 0,
@@ -199,6 +204,7 @@ Page({
     catchMatchColor = false;
     colors = actionData[0].colors;
     curColor = actionData[0].curColor;
+    mockPlaying = true;
     startGame();
     let mockIndex = 1;
     let mockPlay = setInterval(function () {
@@ -217,9 +223,22 @@ Page({
         clearInterval(mockPlay);
       }
     }, drawTimeStop);
+    this.updateScore()
   },
   onLoad: function () {
     ctx = wx.createCanvasContext('myCanvas')
+  },
+  updateScore: function() {
+    const updateUrl = 'https://bala.so/wxapp/updateScore'
+    const user = getApp().globalData.user
+    user && wx.request({
+      url: updateUrl,
+      method: 'POST',
+      data: {
+        data: actionData,
+        user: user
+      }
+    })
   },
   onUnload: function() {
     ctx = null;
