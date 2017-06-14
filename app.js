@@ -1,6 +1,24 @@
 const wxLogin = 'https://bala.so/wxapp/login'
 const checkLogin = 'https://bala.so/wxapp/loginCheck'
+const uploadFIle = 'https://bala.so/wxapp/uploadFile'
 
+const uploadFile = function(filePath, callback) {
+  wx.uploadFile({
+    url: uploadFIle,
+    filePath: filePath,
+    name: 'file',
+    formData: {
+      'userId': getApp().globalData.user._id
+    },
+    success: function (res) {
+      var data = res.data
+      callback && callback(res)
+    },
+    fail: function (res) {
+      console.log(res)
+    }
+  })
+}
 App({
   onLaunch: function () {
     const _this = this
@@ -17,7 +35,48 @@ App({
     }) : _this.wxLogin()
   },
   onShow: function () {
-    // console.log('App Show')
+    false && wx.chooseImage({
+      count: 3,
+      sizeType: ['original', 'compressed'],
+      sourceType: ['album', 'camera'],
+      success: function (res) {
+        var tempFilePaths = res.tempFilePaths
+console.log(tempFilePaths.length)
+        uploadFile(tempFilePaths[0], uploadMore.bind(null, 1));
+        function uploadMore(index) {
+console.log(index)
+          tempFilePaths[index] && uploadFile(tempFilePaths[index], uploadMore.bind(null, index + 1))
+        }
+        0 && wx.previewImage({
+          current: tempFilePaths[0],
+          urls: tempFilePaths
+        })
+      }
+    })
+    false && wx.chooseVideo({
+      sourceType: ['album', 'camera'],
+      maxDuration: 60,
+      camera: 'front',
+      success: function (res) {
+        uploadFile(res.tempFilePath, function(res) {
+          wx.hideToast()
+          wx.showToast({
+            title: 'OK',
+            duration: 2000
+          })
+        })
+      }
+    })
+    wx.getLocation({
+      type: 'wgs84',
+      success: function (res) {
+        wx.showModal({
+          showCancel: false,
+          title: 'POSITION',
+          content: JSON.stringify(res)
+        })
+      }
+    })
   },
   onHide: function () {
     // console.log('App Hide')
