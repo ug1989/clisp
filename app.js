@@ -1,10 +1,11 @@
-const wxLogin = 'https://bala.so/wxapp/login'
-const checkLogin = 'https://bala.so/wxapp/loginCheck'
-const uploadFIle = 'https://bala.so/wxapp/uploadFile'
+const loginUrl = 'https://bala.so/wxapp/login'
+const verifyLoginUrl = 'https://bala.so/wxapp/loginCheck'
+const uploadFileUrl = 'https://bala.so/wxapp/uploadFile'
+const socketUrl = 'wss://bala.so/wss/wxapp'
 
 const uploadFile = function(filePath, callback) {
   wx.uploadFile({
-    url: uploadFIle,
+    url: uploadFileUrl,
     filePath: filePath,
     name: 'file',
     formData: {
@@ -23,8 +24,6 @@ App({
   onLaunch: function () {
     const _this = this
     const user = wx.getStorageSync('user')
-    // this.wxLogin();
-    // return;
     user ? wx.checkSession({
       success: function (res) {
         _this.globalData.user = user
@@ -35,6 +34,7 @@ App({
     }) : _this.wxLogin()
   },
   onShow: function () {
+    // test chooseImage
     false && wx.chooseImage({
       count: 3,
       sizeType: ['original', 'compressed'],
@@ -53,6 +53,7 @@ console.log(index)
         })
       }
     })
+    // test chooseVideo
     false && wx.chooseVideo({
       sourceType: ['album', 'camera'],
       maxDuration: 60,
@@ -67,7 +68,8 @@ console.log(index)
         })
       }
     })
-    wx.getLocation({
+    // test location
+    false && wx.getLocation({
       type: 'wgs84',
       success: function (res) {
         wx.showModal({
@@ -76,6 +78,23 @@ console.log(index)
           content: JSON.stringify(res)
         })
       }
+    })
+    // test socket
+    wx.connectSocket({
+      url: socketUrl
+    })
+    wx.onSocketOpen(function (res) {
+      console.log('WebSocket连接已打开！')
+      wx.onSocketMessage(function (res) {
+        console.log('收到服务器内容：' + res.data)
+        wx.sendSocketMessage({
+          data: 'msg'
+        })
+        wx.closeSocket()
+      })
+    })
+    wx.onSocketError(function (res) {
+      console.log('WebSocket连接打开失败，请检查！')
     })
   },
   onHide: function () {
@@ -86,7 +105,7 @@ console.log(index)
     wx.login({
       success: function (res) {
         res.code && wx.request({
-          url: wxLogin,
+          url: loginUrl,
           data: {
             code: res.code
           },
@@ -96,7 +115,7 @@ console.log(index)
             userId && wx.getUserInfo({
               success: function (res) {
                 wx.request({
-                  url: checkLogin,
+                  url: verifyLoginUrl,
                   data: {
                     userId: userId,
                     rawData: res.rawData,
