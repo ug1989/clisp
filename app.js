@@ -67,7 +67,7 @@ console.log(index)
         })
       }
     })
-    wx.getLocation({
+    false && wx.getLocation({
       type: 'wgs84',
       success: function (res) {
         wx.showModal({
@@ -77,6 +77,27 @@ console.log(index)
         })
       }
     })
+    wx.startRecord({
+      success: function (res) {
+        wx.playVoice({
+          filePath: res.tempFilePath,
+          complete: function(){}
+        })
+        false && uploadFile(res.tempFilePath, function(_) {
+          wx.showToast({
+            title: JSON.stringify(_),
+          })
+        })
+      },
+      fail: function (res) {
+        wx.showToast({
+          title: 'record fail',
+        })
+      }
+    })
+    setTimeout(function () {
+      wx.stopRecord()
+    }, 10000)
   },
   onHide: function () {
     // console.log('App Hide')
