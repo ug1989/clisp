@@ -1,10 +1,11 @@
-const wxLogin = 'https://bala.so/wxapp/login'
-const checkLogin = 'https://bala.so/wxapp/loginCheck'
-const uploadFIle = 'https://bala.so/wxapp/uploadFile'
+const loginUrl = 'https://bala.so/wxapp/login'
+const verifyLoginUrl = 'https://bala.so/wxapp/loginCheck'
+const uploadFileUrl = 'https://bala.so/wxapp/uploadFile'
+const socketUrl = 'wss://bala.so/wss/wxapp?userId=USERID'
 
 const uploadFile = function(filePath, callback) {
   wx.uploadFile({
-    url: uploadFIle,
+    url: uploadFileUrl,
     filePath: filePath,
     name: 'file',
     formData: {
@@ -23,8 +24,6 @@ App({
   onLaunch: function () {
     const _this = this
     const user = wx.getStorageSync('user')
-    // this.wxLogin();
-    // return;
     user ? wx.checkSession({
       success: function (res) {
         _this.globalData.user = user
@@ -35,6 +34,8 @@ App({
     }) : _this.wxLogin()
   },
   onShow: function () {
+
+    // test chooseImage
     false && wx.chooseImage({
       count: 3,
       sizeType: ['original', 'compressed'],
@@ -53,6 +54,8 @@ console.log(index)
         })
       }
     })
+
+    // test chooseVideo
     false && wx.chooseVideo({
       sourceType: ['album', 'camera'],
       maxDuration: 60,
@@ -67,6 +70,8 @@ console.log(index)
         })
       }
     })
+
+		// test location
     false && wx.getLocation({
       type: 'wgs84',
       success: function (res) {
@@ -77,13 +82,15 @@ console.log(index)
         })
       }
     })
-    wx.startRecord({
+
+    // test record
+    false && wx.startRecord({
       success: function (res) {
         wx.playVoice({
           filePath: res.tempFilePath,
           complete: function(){}
         })
-        false && uploadFile(res.tempFilePath, function(_) {
+        uploadFile(res.tempFilePath, function(_) {
           wx.showToast({
             title: JSON.stringify(_),
           })
@@ -95,9 +102,34 @@ console.log(index)
         })
       }
     })
-    setTimeout(function () {
+    false && setTimeout(function () {
       wx.stopRecord()
     }, 10000)
+    
+    // test socket
+    const user = wx.getStorageSync('user')
+    wx.connectSocket({
+      url: socketUrl.replace('USERID', user._id)
+    })
+    wx.onSocketOpen(function (res) {
+      console.log('socket connected')
+      let counter = 0;
+      wx.onSocketMessage(function (res) {
+        const sc = JSON.stringify({ name: 'who are you' }).repeat(1)
+        console.log('返回内容：', res.data)
+        console.log('\n准备发送：', +new Date + '')
+        wx.sendSocketMessage({
+          data: sc,
+          success: function() {
+            console.log('发送成功：', +new Date + '')
+            counter++ == 1 && wx.closeSocket()
+          }
+        })
+      })
+    })
+    wx.onSocketError(function (res) {
+      console.log('socket connected fail')
+    })
   },
   onHide: function () {
     // console.log('App Hide')
@@ -107,7 +139,7 @@ console.log(index)
     wx.login({
       success: function (res) {
         res.code && wx.request({
-          url: wxLogin,
+          url: loginUrl,
           data: {
             code: res.code
           },
@@ -117,7 +149,7 @@ console.log(index)
             userId && wx.getUserInfo({
               success: function (res) {
                 wx.request({
-                  url: checkLogin,
+                  url: verifyLoginUrl,
                   data: {
                     userId: userId,
                     rawData: res.rawData,
