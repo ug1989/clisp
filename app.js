@@ -32,6 +32,12 @@ App({
         _this.wxLogin()
       }
     }) : _this.wxLogin()
+
+    wx.getSetting({
+      success(res) {
+        console.log(res);
+      }
+    })
   },
   onShow: function () {
 
