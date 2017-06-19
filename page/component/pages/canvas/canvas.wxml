@@ -17,6 +17,7 @@
 
   <view class="classname">
     {{level}} : {{tapTimes}}
+    <audio  src="{{src}}" id="myAudio" ></audio>
   </view>
 
   <!--<template is="foot" />-->
