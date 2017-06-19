@@ -234,9 +234,6 @@ Page({
     }, drawTimeStop);
     this.updateScore()
   },
-  onLoad: function () {
-    ctx = wx.createCanvasContext('myCanvas')
-  },
   updateScore: function() {
     const updateUrl = 'https://bala.so/wxapp/updateScore'
     const user = getApp().globalData.user
@@ -248,6 +245,25 @@ Page({
         user: user
       }
     })
+  },
+  onLoad: function () {
+    ctx = wx.createCanvasContext('myCanvas')
+  },
+  onShareAppMessage: function (res) {
+    if (res.from === 'button') {
+      console.log(res.target)
+    }
+    const user = getApp().globalData.user
+    return {
+      title: user.nickName + '邀你挑战《眼疾手快》',
+			path: '/page/games/canvas/canvas?id=' + user._id,
+      success: function(res) {
+        // 转发成功
+      },
+      fail: function(res) {
+        // 转发失败
+      }
+    }
   },
   onUnload: function() {
     ctx = null;

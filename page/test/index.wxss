@@ -1,0 +1,9 @@
+.menu {
+  text-align: center;
+  padding-top: 66rpx;
+}
+.navigator {
+  padding: 10px;
+  width: 45%;
+  background-color: '#ff8800';
+}

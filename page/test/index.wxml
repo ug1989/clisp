@@ -1,0 +1,17 @@
+<view class="container">
+  <view class="page-body">
+    <view bindtap="uploadImage" class="menu">Upload Image</view>
+    <view bindtap="uploadVideo" class="menu">Upload Video</view>
+    <view bindtap="uploadRecord" class="menu">Upload Record</view>
+    <view bindtap="openSocket" class="menu">Open Socket</view>
+    <view bindtap="getLocation" class="menu">Get Location</view>
+    <view>
+        <navigator url="/page/game/canvas">
+            <view class="navigator-text" class="navigator">CANVAS</view>
+        </navigator>
+        <navigator url="/page/user/index">
+            <view class="navigator-text" class="navigator">USER</view>
+        </navigator>
+    </view>
+  </view>
+</view>

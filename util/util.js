@@ -30,7 +30,28 @@ function formatLocation(longitude, latitude) {
   }
 }
 
+function uploadFile(filePath, callback) {
+  const uploadFileUrl = 'https://bala.so/wxapp/uploadFile'
+  const user = getApp().globalData.user
+  wx.uploadFile({
+    url: uploadFileUrl,
+    filePath: filePath,
+    name: 'file',
+    formData: {
+      'userId': user && user._id || ''
+    },
+    success: function (res) {
+      var data = res.data
+      callback && callback(res)
+    },
+    fail: function (res) {
+      console.log(res)
+    }
+  })
+}
+
 module.exports = {
+  uploadFile: uploadFile,
   formatTime: formatTime,
   formatLocation: formatLocation
 }
