@@ -20,10 +20,12 @@ const uploadFile = function(filePath, callback) {
     }
   })
 }
+
 App({
   onLaunch: function () {
     const _this = this
     const user = wx.getStorageSync('user')
+
     user ? wx.checkSession({
       success: function (res) {
         _this.globalData.user = user
@@ -40,7 +42,6 @@ App({
     })
   },
   onShow: function () {
-
     // test chooseImage
     false && wx.chooseImage({
       count: 3,
