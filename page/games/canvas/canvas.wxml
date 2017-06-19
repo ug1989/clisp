@@ -1,0 +1,23 @@
+<view class="container">
+  <!--<template is="head" data="{{title: 'canvas'}}"/>-->
+
+  <view class="page-body">
+    <canvas class="canvas" canvas-id="myCanvas"
+    style="margin: 0; border: none;"
+    bindtouchstart="start"
+    bindtouchmove="move"
+    bindtouchend="end"
+    disable-scroll="{{true}}" />
+    <button class="retry" bindtap="newGame">New Game</button>
+    <button class="retry" bindtap="playShow">Show Game</button>
+  </view>
+
+  <view class="classname">
+    {{level}} : {{tapTimes}}
+    <audio  src="{{src}}" id="myAudio" ></audio>
+  </view>
+
+  <!--<template is="foot" />-->
+</view>
+
+
