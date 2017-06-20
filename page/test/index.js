@@ -1,4 +1,4 @@
-var app = getApp()
+let socketOn = false;
 const uploadFile = require('../../util/util.js').uploadFile
 
 Page({
@@ -65,24 +65,32 @@ Page({
     openSocket: function () {
         const user = wx.getStorageSync('user')
         const socketUrl = 'wss://bala.so/wss/wxapp?userId=USERID'
+        socketOn && (wx.closeSocket(), socketOn = false)
         wx.connectSocket({
             url: socketUrl.replace('USERID', user._id)
         })
         wx.onSocketOpen(function (res) {
-            console.log('通道开启')
+            socketOn = true
+            wx.showToast({
+              title: '通道开启'
+            })
             let lastSendTime = +new Date
             let counter = 0
+            let _tt = +new Date
             wx.onSocketMessage(function (res) {
                 const newTime = +new Date
-                console.log('oMessage : ', newTime - lastSendTime, res.data.length / 1024)
+                console.log('oMessage : ', newTime - lastSendTime)
                 lastSendTime = newTime
                 counter++
                 wx.sendSocketMessage({
-                  data: (counter + '').repeat(3111111),
+                  data: (+new Date + '').repeat(111111),
                   success: function () {
                     const _newTime = +new Date
-                    console.log('onSucess : ', _newTime - newTime)
-                    counter > 11 && (wx.closeSocket(), console.log('通道关闭'))
+                    console.log('onSucess : ', _newTime - newTime, counter)
+                    counter > 1111 && (wx.closeSocket(), wx.showToast({
+                      title: '通道关闭' + (+new Date - _tt) / 1000,
+                      duration: 5000
+                    }))
                   }
                 })
             })
