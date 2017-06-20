@@ -24,6 +24,7 @@ const actionData = [];
 let gameStartTime;
 let gameEndTime;
 let mockPlaying;
+let canStartGame = true;
 
 // 游戏动画
 function draw() {
@@ -125,6 +126,10 @@ Page({
   },
   onReady: function (e) { },
   start: function (e) {
+    if (speed == 0 && canStartGame) {
+      canStartGame = false
+      return this.newGame()
+    }
     // 重现游戏中
     if (mockPlaying) return;
     // 点击在圆圈内有效
@@ -135,6 +140,11 @@ Page({
   },
   move: function (e) { },
   end: function (e) { },
+  freeStart: function() {
+    canStartGame = true;
+    this.newGame()
+    speed = 0
+  },
   reverse: function() {
     if (!speed) return;
 
@@ -243,8 +253,6 @@ Page({
   },
   onLoad: function () {
     ctx = wx.createCanvasContext('myCanvas')
-    this.newGame()
-    speed = 0
   },
   onShareAppMessage: function (res) {
     if (res.from === 'button') {
