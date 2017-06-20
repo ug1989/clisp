@@ -1,3 +1,12 @@
+const loginFailInfo = function() {
+  const alertMsg = "　　获取登录信息失败，部分功能可能受限，删除小程序重新进入可更新授权。"
+  wx.showModal({
+    content: alertMsg,
+    showCancel: false,
+    confirmText: "确定"
+  })
+}
+
 App({
   globalData: {
     hasLogin: false,
@@ -15,12 +24,6 @@ App({
         _this.wxLogin()
       }
     }) : _this.wxLogin()
-
-    wx.getSetting({
-      success(res) {
-        console.log(res);
-      }
-    })
   },
   onShow: function () {},
   onHide: function () {},
@@ -29,7 +32,7 @@ App({
     wx.login({
       success: function (res) {
         const loginUrl = 'https://bala.so/wxapp/login'
-        res.code && wx.request({
+        !res.code ? loginFailInfo() : wx.request({
           url: loginUrl,
           data: {
             code: res.code
@@ -60,13 +63,7 @@ App({
           }
         })
       },
-      fail: function (res) {
-        wx.showModal({
-          content: "　　获取登录信息失败，部分功能可能受限，删除小程序重新进入可更新授权。",
-          showCancel: false,
-          confirmText: "确定"
-        })
-      }
+      fail: loginFailInfo
     })
   }
 })

@@ -3,6 +3,18 @@ const uploadFile = require('../../util/util.js').uploadFile
 
 Page({
     data: {},
+    onLoad: function() {
+      this.audioCtx = wx.createAudioContext('myAudio')
+      this.audioCtx.setSrc('https://bala.so/ga.mp3')
+      this.audioCtx.seek(0);
+      this.audioCtx.play();
+      // get authorize perssion
+      wx.getSetting({
+        success(res) {
+          console.dir(res);
+        }
+      })
+    },
     uploadImage: function() {
         wx.chooseImage({
             count: 9,
@@ -83,7 +95,7 @@ Page({
                 lastSendTime = newTime
                 counter++
                 wx.sendSocketMessage({
-                  data: (+new Date + '').repeat(111111),
+                  data: (+new Date + '').repeat(11),
                   success: function () {
                     const _newTime = +new Date
                     console.log('onSucess : ', _newTime - newTime, counter)

@@ -120,20 +120,17 @@ wx.getSystemInfo({
 // 定义页面内容
 Page({
   data: {
-    src: '',
     level: 1,
     tapTimes: 0
   },
-  onReady: function (e) {
-    // 使用 wx.createAudioContext 获取 audio 上下文 context
-    this.audioCtx = wx.createAudioContext('myAudio')
-    this.audioCtx.setSrc('https://bala.so/ga.mp3')
-  },
+  onReady: function (e) { },
   start: function (e) {
-    if (mockPlaying) return; // 重现游戏中
+    // 重现游戏中
+    if (mockPlaying) return;
+    // 点击在圆圈内有效
     // const touchPoint = e.touches[0];
     // const distance = Math.sqrt((center - touchPoint.x) * (center - touchPoint.x) + (center - touchPoint.y) * (center - touchPoint.y));
-    // distance < center * radiusScale && this.reverse(); // 点击在圆圈内有效
+    // distance < center * radiusScale && this.reverse();
     this.reverse();
   },
   move: function (e) { },
@@ -224,8 +221,6 @@ Page({
         colors = actionData[mockIndex].colors;
         curColor = actionData[mockIndex].curColor;
         mockIndex += 1;
-        _this.audioCtx.seek(0);
-        _this.audioCtx.play();
       }
       if (speed == 0 || matchAngle && stopMock) {
         speed = 0;
@@ -248,6 +243,8 @@ Page({
   },
   onLoad: function () {
     ctx = wx.createCanvasContext('myCanvas')
+    this.newGame()
+    speed = 0
   },
   onShareAppMessage: function (res) {
     if (res.from === 'button') {
@@ -257,12 +254,8 @@ Page({
     return {
       title: user.nickName + '邀你挑战《眼疾手快》',
 			path: '/page/games/canvas/canvas?id=' + user._id,
-      success: function(res) {
-        // 转发成功
-      },
-      fail: function(res) {
-        // 转发失败
-      }
+      success: function(res) { },
+      fail: function(res) { }
     }
   },
   onUnload: function() {
