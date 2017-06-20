@@ -143,6 +143,7 @@ Page({
   freeStart: function() {
     canStartGame = true;
     this.newGame()
+    curColor = 'YellowGreen'
     speed = 0
   },
   reverse: function() {
@@ -253,6 +254,7 @@ Page({
   },
   onLoad: function () {
     ctx = wx.createCanvasContext('myCanvas')
+    this.freeStart()
   },
   onShareAppMessage: function (res) {
     if (res.from === 'button') {
