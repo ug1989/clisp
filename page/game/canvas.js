@@ -143,7 +143,7 @@ Page({
   freeStart: function() {
     canStartGame = true;
     this.newGame()
-    curColor = 'YellowGreen'
+    curColor = allColors[0]
     speed = 0
   },
   reverse: function() {
@@ -253,6 +253,32 @@ Page({
     })
   },
   onLoad: function () {
+    const _this = this
+    const appInfo = getApp().globalData
+    const shareTicket = appInfo.options.shareTicket
+    shareTicket && wx.getShareInfo({
+      shareTicket: shareTicket,
+      success: function(res) {
+        const uploadGroupUrl = 'https://bala.so/wxapp/saveGroupInfo'
+        res.userId = appInfo.userId || appInfo.user._id
+        wx.request({
+          url: uploadGroupUrl,
+          data: res,
+          method: 'POST',
+          success: function(res) {
+            const openGId = res.data && res.data.openGId
+            openGId && _this.setData({
+              groupId: openGId
+            })
+          }
+        })
+      }
+    })
+    // 指定标记分享
+    wx.showShareMenu && wx.showShareMenu({
+      withShareTicket: true
+    })
+    // 初始化游戏数据
     ctx = wx.createCanvasContext('myCanvas')
     this.freeStart()
   },
@@ -263,8 +289,24 @@ Page({
     const user = getApp().globalData.user
     return {
       title: user.nickName + '邀你挑战《眼疾手快》',
-			path: '/page/games/canvas/canvas?id=' + user._id,
-      success: function(res) { },
+			path: '/page/game/canvas?id=' + user._id,
+      success: function (res) {
+        const saveTicketUrl = 'https://bala.so/wxapp/saveShareTicket'
+        const shareTicket = res.shareTickets[0]
+        const user = getApp().globalData.user
+        if (!shareTicket || !user) return
+        wx.request({
+          url: saveTicketUrl,
+          method: 'POST',
+          data: {
+            userId: user._id,
+            shareTicket: shareTicket
+          },
+          success: function(res) {
+            // request ok
+          }
+        })
+      },
       fail: function(res) { }
     }
   },

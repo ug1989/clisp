@@ -9,26 +9,25 @@ const loginFailInfo = function() {
 
 App({
   globalData: {
-    hasLogin: false,
     user: null
   },
-  onLaunch: function () {
+  onLaunch: function (options) {
     const _this = this
     const user = wx.getStorageSync('user')
-
+    this.globalData.user = user
+    this.globalData.options = options
     user ? wx.checkSession({
-      success: function (res) {
-        _this.globalData.user = user
-      },
-      fail: function(res) {
+      success: function (res) { },
+      fail: function (res) {
         _this.wxLogin()
       }
     }) : _this.wxLogin()
   },
-  onShow: function () {},
+  onShow: function (options) { },
   onHide: function () {},
   wxLogin: function () {
     const _this = this
+    // 获取wxapp登录凭证，拿到openId创建或更新用户
     wx.login({
       success: function (res) {
         const loginUrl = 'https://bala.so/wxapp/login'
@@ -39,9 +38,11 @@ App({
           },
           success: function (res) {
             const userId = res.data && res.data.userId
-            // update userInfo on server
+            _this.globalData.userId = userId
+            // 获取用户信息，头像、昵称等
             userId && wx.getUserInfo({
               success: function (res) {
+                // 校验用户信息，通过验证hashed信息确认信息来自微信
                 const verifyLoginUrl = 'https://bala.so/wxapp/loginCheck'
                 wx.request({
                   url: verifyLoginUrl,

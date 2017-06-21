@@ -9,9 +9,21 @@ Page({
       this.audioCtx.seek(0);
       this.audioCtx.play();
       // get authorize perssion
-      wx.getSetting({
+      0 && wx.getSetting({
         success(res) {
           console.dir(res);
+        }
+      })
+      wx.updateShareMenu({
+        withShareTicket: true,
+        success: function(e) {}
+      })
+    },
+    onShow: function () {
+      wx.getShareInfo && wx.getShareInfo({
+        shareTicket: 'shareTicket',
+        success: function(e) {
+          console.log(e)
         }
       })
     },
