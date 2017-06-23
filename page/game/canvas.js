@@ -6,7 +6,7 @@ const strokeWidth = 10; // 绘图宽度
 const allColors =  "Tomato,Turquoise,SteelBlue,Gold,BlueViolet,CornflowerBlue,Crimson,DarkCyan,DarkMagenta,DeepPink,DodgerBlue,ForestGreen,DarkOrange,LightSalmon,LightSeaGreen,Chocolate,MediumSlateBlue,Orange,OrangeRed,OliveDrab,Purple,PaleVioletRed,RoyalBlue,Salmon,SeaGreen,SandyBrown,SlateBlue,YellowGreen".split(','); // 可供选择的所有颜色
 let colors = []; // 当前实际展示的颜色
 const bgColor = '#ffffff';
-const radiusScale = 0.7;
+const radiusScale = 0.7;  // 圆形区域尺寸所占比例
 
 // 动画相关变量
 let drawAnimation; // 动画定时器
@@ -32,7 +32,7 @@ function draw() {
   
   const colorNum = colors.length;
   const arcAngle = _angle / 360 * Math.PI            // 旋转弧度
-  const radius = center * radiusScale;                 // 外圈半径
+  const radius = center * radiusScale;               // 外圈半径
   const needleLength = radius * 3 / 4;               // 指针长度
   const spaceAngle = 10 / 360;                       // 外圈间隔
   const stepAngle = (2 * Math.PI) / colorNum;        // 外圈分布弧长
@@ -124,24 +124,23 @@ Page({
     level: 1,
     tapTimes: 0
   },
-  onReady: function (e) { },
-  start: function (e) {
+  tap: function (e) {
+    // 重现游戏中
+    if (mockPlaying) return;
+    // 点击开始游戏
     if (speed == 0 && canStartGame) {
       canStartGame = false
       return this.newGame()
     }
-    // 重现游戏中
-    if (mockPlaying) return;
     // 点击在圆圈内有效
     // const touchPoint = e.touches[0];
     // const distance = Math.sqrt((center - touchPoint.x) * (center - touchPoint.x) + (center - touchPoint.y) * (center - touchPoint.y));
     // distance < center * radiusScale && this.reverse();
     this.reverse();
   },
-  move: function (e) { },
-  end: function (e) { },
   freeStart: function() {
-    canStartGame = true;
+    // 设置开始游戏准备,但不开始游戏
+    canStartGame = true
     this.newGame()
     curColor = allColors[0]
     speed = 0
@@ -194,6 +193,8 @@ Page({
     colors = allColors.slice(0, 3);
     curColor = getNewColor(colors[0]);
     mockPlaying = false;
+    endGame();
+    startGame();
     // 设置显示数据
     this.setData({
       tapTimes: 0,
@@ -206,8 +207,6 @@ Page({
       curColor: curColor,
       _angle: _angle
     });
-    endGame();
-    startGame();
   },
   playShow() {
     const _this = this;
@@ -219,13 +218,13 @@ Page({
     catchMatchColor = false;
     colors = actionData[0].colors;
     curColor = actionData[0].curColor;
-    mockPlaying = true;
+    mockPlaying = true; // 阻止点击影响重现
     startGame();
     let mockIndex = 1;
     let mockPlay = setInterval(function () {
       const stopMock = actionData[mockIndex].stop;
       const matchAngle = _angle == actionData[mockIndex]._angle;
-      
+      // 模拟反转
       if (actionData[mockIndex] && matchAngle && !stopMock) {
         direction *= -1;
         catchMatchColor = false;
@@ -233,6 +232,7 @@ Page({
         curColor = actionData[mockIndex].curColor;
         mockIndex += 1;
       }
+      // 模拟停止
       if (speed == 0 || matchAngle && stopMock) {
         speed = 0;
         clearInterval(mockPlay);
@@ -241,6 +241,7 @@ Page({
     this.updateScore()
   },
   updateScore: function() {
+    // 上传游戏得分
     const updateUrl = 'https://bala.so/wxapp/updateScore'
     const user = getApp().globalData.user
     user && wx.request({
@@ -256,6 +257,7 @@ Page({
     const _this = this
     const appInfo = getApp().globalData
     const shareTicket = appInfo.options.shareTicket
+    // 获取进入wxapp标示,群聊的话获取群聊游戏排名
     shareTicket && wx.getShareInfo({
       shareTicket: shareTicket,
       success: function(res) {
@@ -283,6 +285,7 @@ Page({
     this.freeStart()
   },
   onShareAppMessage: function (res) {
+    // 分享配置
     if (res.from === 'button') {
       console.log(res.target)
     }
@@ -313,5 +316,6 @@ Page({
   onUnload: function() {
     ctx = null;
     endGame();
-  }
+  },
+  noop: function (e) { }
 })

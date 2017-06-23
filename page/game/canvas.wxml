@@ -5,9 +5,9 @@
     </view>
     <canvas class="canvas" canvas-id="myCanvas"
     style="margin: 0; border: none;"
-    bindtouchstart="start"
-    bindtouchmove="move"
-    bindtouchend="end"
+    bindtouchstart="tap"
+    bindtouchmove="noop"
+    bindtouchend="noop"
     disable-scroll="{{true}}" />
     <button class="retry" bindtap="freeStart">New Game</button>
     <button class="retry" bindtap="playShow">Show Game</button>
