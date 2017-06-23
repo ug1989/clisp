@@ -291,7 +291,7 @@ Page({
     }
     const user = getApp().globalData.user
     return {
-      title: user.nickName + '邀你挑战《眼疾手快》',
+      title: user.nickName + '邀你挑战《心灵手巧》',
 			path: '/page/game/canvas?id=' + user._id,
       success: function (res) {
         const saveTicketUrl = 'https://bala.so/wxapp/saveShareTicket'
