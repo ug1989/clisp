@@ -256,26 +256,10 @@ Page({
   onLoad: function () {
     const _this = this
     const appInfo = getApp().globalData
-    const shareTicket = appInfo.options.shareTicket
-    // 获取进入wxapp标示,群聊的话获取群聊游戏排名
-    shareTicket && wx.getShareInfo({
-      shareTicket: shareTicket,
-      success: function(res) {
-        const uploadGroupUrl = 'https://bala.so/wxapp/saveGroupInfo'
-        res.userId = appInfo.userId || appInfo.user._id
-        wx.request({
-          url: uploadGroupUrl,
-          data: res,
-          method: 'POST',
-          success: function(res) {
-            const openGId = res.data && res.data.openGId
-            openGId && _this.setData({
-              groupId: openGId
-            })
-          }
-        })
-      }
-    })
+    // openGId 直接获取，不然等到获取信息后在获取
+    appInfo.openGId
+      ? this.getGroupScore(appInfo.openGId)
+      : appInfo.getInfoWithGId = this.getGroupScore.bind(this)
     // 指定标记分享
     wx.showShareMenu && wx.showShareMenu({
       withShareTicket: true
@@ -283,6 +267,13 @@ Page({
     // 初始化游戏数据
     ctx = wx.createCanvasContext('myCanvas')
     this.freeStart()
+  },
+  // 根据openId获取群聊游戏成绩
+  getGroupScore: function(groupId) {
+    wx.showToast({
+      title: 'groupId + ' + groupId,
+      duration: 5000
+    })
   },
   onShareAppMessage: function (res) {
     // 分享配置

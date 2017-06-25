@@ -8,23 +8,21 @@ const loginFailInfo = function() {
 }
 
 App({
-  globalData: {
-    user: null
-  },
+  globalData: {},
   onLaunch: function (options) {
     const _this = this
     const user = wx.getStorageSync('user')
     this.globalData.user = user
     this.globalData.options = options
     user ? wx.checkSession({
-      success: function (res) { },
+      success: function (res) {
+        _this.joinGroup()
+      },
       fail: function (res) {
         _this.wxLogin()
       }
     }) : _this.wxLogin()
   },
-  onShow: function (options) { },
-  onHide: function () {},
   wxLogin: function () {
     const _this = this
     // 获取wxapp登录凭证，拿到openId创建或更新用户
@@ -56,6 +54,7 @@ App({
                     if (res.data) {
                       wx.setStorageSync('user', res.data)
                       _this.globalData.user = res.data
+                      _this.joinGroup()
                     }
                   }
                 })
@@ -66,5 +65,29 @@ App({
       },
       fail: loginFailInfo
     })
-  }
+  },
+  joinGroup: function() {
+    const appInfo = this.globalData
+    const shareTicket = appInfo.options.shareTicket
+    // 获取群分享标示，添加当前用户到改群
+    shareTicket && wx.getShareInfo({
+      shareTicket: shareTicket,
+      success: function(res) {
+        const uploadGroupUrl = 'https://bala.so/wxapp/saveGroupInfo'
+        res.userId = appInfo.userId || appInfo.user._id
+        wx.request({
+          url: uploadGroupUrl,
+          data: res,
+          method: 'POST',
+          success: function(res) {
+            const openGId = res.data && res.data.openGId
+            appInfo.openGId = openGId
+            openGId && appInfo.getInfoWithGId && appInfo.getInfoWithGId(openGId)
+          }
+        })
+      }
+    })
+  },
+  onShow: function () {},
+  onHide: function () {}
 })
