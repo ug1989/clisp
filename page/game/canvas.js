@@ -25,6 +25,7 @@ let gameStartTime;
 let gameEndTime;
 let mockPlaying;
 let canStartGame = true;
+let endGameAction;
 
 // 游戏动画
 function draw() {
@@ -80,10 +81,10 @@ function draw() {
   
   // 停止动画
   if (!speed) {
-    actionData.push({
+    gameEndTime && actionData.push({
       _angle: _angle,
       stop: true
-    });
+    })
     endGame();
   };
 }
@@ -104,9 +105,11 @@ function startGame() {
 function endGame() {
   if (gameStartTime) {
     console.log(+new Date - gameStartTime);
+    !mockPlaying && endGameAction && endGameAction();
     gameStartTime = 0;
   }
   mockPlaying = false;
+  actionData.length = 0;
   clearInterval(drawAnimation)
 }
 
@@ -149,7 +152,11 @@ Page({
     if (!speed) return;
 
     // 非反转区域
-    if (!catchMatchColor) return speed = 0;
+		if (!catchMatchColor) {
+				this.updateScore();
+				speed = 0;
+				return
+		}
 
     // 可以反向，重置部分变量
     catchMatchColor = false;
@@ -210,7 +217,7 @@ Page({
   },
   playShow() {
     const _this = this;
-    if (actionData.length < 2) return;
+    if (actionData.length < 2 || speed) return;
     // 重置动画变量
     speed = initSpeed;
     _angle = 0;
@@ -219,9 +226,14 @@ Page({
     colors = actionData[0].colors;
     curColor = actionData[0].curColor;
     mockPlaying = true; // 阻止点击影响重现
+    clearInterval(mockPlay);
     startGame();
     let mockIndex = 1;
     let mockPlay = setInterval(function () {
+      if (!actionData[mockIndex]) {
+        clearInterval(mockPlay);
+        return
+      }
       const stopMock = actionData[mockIndex].stop;
       const matchAngle = _angle == actionData[mockIndex]._angle;
       // 模拟反转
@@ -235,12 +247,18 @@ Page({
       // 模拟停止
       if (speed == 0 || matchAngle && stopMock) {
         speed = 0;
+				endGame();
         clearInterval(mockPlay);
       }
     }, drawTimeStop);
-    this.updateScore()
   },
   updateScore: function() {
+    const lastScore = wx.getStorageSync('score')
+    if (actionData.length < 5 || actionData.length < lastScore) {
+      console.log('poor result, Stop here')
+      return;
+    }
+    wx.setStorageSync('score', actionData.length)
     // 上传游戏得分
     const updateUrl = 'https://bala.so/wxapp/updateScore'
     const user = getApp().globalData.user
@@ -250,10 +268,18 @@ Page({
       data: {
         data: actionData,
         user: user
+      },
+      success: function(res) {
+        wx.setStorage({
+          key: 'bestScore',
+          data: JSON.stringify(res.data.data),
+        })
+        getApp().globalData.bestScore = res.data.data
       }
     })
   },
   onLoad: function () {
+    endGameAction = this.updateScore.bind(this)
     const _this = this
     const appInfo = getApp().globalData
     // openGId 直接获取，不然等到获取信息后在获取
@@ -306,6 +332,7 @@ Page({
   },
   onUnload: function() {
     ctx = null;
+    endGameAction = null;
     endGame();
   },
   noop: function (e) { }
