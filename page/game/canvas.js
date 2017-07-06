@@ -278,7 +278,9 @@ Page({
       }
     })
   },
-  onLoad: function () {
+  onLoad: function (option) {
+    const shareUserId = option && option.id
+    shareUserId && this.getShareInfo(shareUserId)
     endGameAction = this.updateScore.bind(this)
     const _this = this
     const appInfo = getApp().globalData
@@ -294,11 +296,31 @@ Page({
     ctx = wx.createCanvasContext('myCanvas')
     this.freeStart()
   },
+  // 根据shareUserID获取分享人的分数
+  getShareInfo(id) {
+    const reqUrl = 'https://bala.so/wxapp/getScoreByUser?userId=' + id
+    wx.request({
+      url: reqUrl,
+      success: (res) => {
+        this.setData({
+          shareScore: res.data
+        })
+      }
+    })
+  },
   // 根据openId获取群聊游戏成绩
-  getGroupScore: function(groupId) {
-    wx.showToast({
-      title: 'groupId + ' + groupId,
-      duration: 5000
+  getGroupScore: function (groupId) {
+    const reqUrl = 'https://bala.so/wxapp/getScoreByGroup?groupId=' + groupId
+    wx.request({
+      url: reqUrl,
+      success: (res) => {
+        this.setData({
+          groupScore: res.data
+        })
+        wx.showToast({
+          title: 'GSL' + res.data.length,
+        })
+      }
     })
   },
   onShareAppMessage: function (res) {
