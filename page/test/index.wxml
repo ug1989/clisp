@@ -5,6 +5,9 @@
     <view bindtap="uploadRecord" class="menu">Upload Record</view>
     <view bindtap="openSocket" class="menu">Open Socket</view>
     <view bindtap="getLocation" class="menu">Get Location</view>
+    <form bindsubmit="notifyInfo" report-submit="true" class="menu">
+      <button formType="submit" class="menu">Send Notify</button>
+    </form>
     <view>
         <navigator url="/page/game/canvas">
             <view class="navigator">CANVAS</view>

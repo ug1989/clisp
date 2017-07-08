@@ -134,5 +134,22 @@ Page({
                 })
             }
         })
+    },
+    notifyInfo: function(e) {
+      const form_id = e.detail.formId
+      const notifyUrl = 'https://bala.so/wxapp/notify'
+      const user = getApp().globalData.user
+      form_id && user && wx.request({
+        url: notifyUrl,
+        method: 'POST',
+        data: {
+          page: '/page/test/index',
+          user: user,
+          formId: form_id
+        },
+        success: function (res) {
+          console.log(res)
+        }
+      })
     }
 });
