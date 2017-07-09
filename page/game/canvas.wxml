@@ -1,14 +1,12 @@
 <view class="container">
   <view class="page-body">
-    <view class="scoreInfo">
-      {{level}} : {{tapTimes}}
-    </view>
     <canvas class="canvas" canvas-id="myCanvas"
-    style="margin: 0; border: none;"
-    bindtouchstart="tap"
-    bindtouchmove="noop"
-    bindtouchend="noop"
-    disable-scroll="{{true}}" />
+      style="margin: 0; border: none;"
+      bindtouchstart="tap"
+      bindtouchmove="noop"
+      bindtouchend="noop"
+      disable-scroll="{{true}}"
+    />
     <button class="retry" bindtap="freeStart">New Game</button>
     <button class="retry" bindtap="playShow">Show Game</button>
   </view>

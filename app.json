@@ -1,7 +1,7 @@
 {
   "pages": [
-    "page/test/index",
     "page/game/canvas",
+    "page/test/index",
     "page/user/index"
   ],
   "window": {

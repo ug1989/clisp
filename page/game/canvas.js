@@ -10,6 +10,8 @@ const radiusScale = 0.7;  // 圆形区域尺寸所占比例
 
 // 动画相关变量
 let drawAnimation; // 动画定时器
+let _gameLevel;
+let _gameTap;
 let _angle = 0; // 当前旋转角度
 let curColor;   // 当前指针颜色
 let speed = 0;  // 当前旋转速度
@@ -24,8 +26,8 @@ const actionData = [];
 let gameStartTime;
 let gameEndTime;
 let mockPlaying;
-let canStartGame = true;
 let endGameAction;
+let canStartGame = true;
 
 // 游戏动画
 function draw() {
@@ -65,6 +67,19 @@ function draw() {
   ctx.moveTo(center, center)
   ctx.lineTo(center + Math.cos(arcAngle) * needleLength, center + Math.sin(arcAngle) * needleLength)
   ctx.stroke()
+
+  // 文字提示
+  ctx.setFillStyle('#ffffff')
+  ctx.setFontSize(25)
+  ctx.setTextAlign('center')
+  ctx.fillText('第 ' + _gameLevel + ' 级    第 ' + (_gameLevel == 1 ? _gameTap : _gameTap + 1) + ' 击', center, 40)
+  if (canStartGame) {
+    ctx.setFontSize(15)
+    ctx.setTextAlign('center')
+    ctx.fillText('指针进入同色弧形区域时点击', center, 2 * center - 20)
+  }
+
+  // 绘图  
   ctx.draw()
 
   // 计算当前指针位置对应外圈颜色序号
@@ -104,8 +119,7 @@ function startGame() {
 
 function endGame() {
   if (gameStartTime) {
-    console.log(+new Date - gameStartTime);
-    !mockPlaying && endGameAction && endGameAction();
+    !mockPlaying && endGameAction && endGameAction(+new Date - gameStartTime);
     gameStartTime = 0;
   }
   mockPlaying = false;
@@ -164,10 +178,10 @@ Page({
 
     // 达到升级次数设置升级，如果所有颜色都已经展示，无限计数点击次数
     if (this.data.tapTimes == levelUpLimit && this.data.level < allColors.length - 2) {
-      this.data.level += 1;
-      this.data.tapTimes = 0;
+      _gameLevel = this.data.level += 1;
+      _gameTap = this.data.tapTimes = 0;
     } else {
-      this.data.tapTimes += 1
+      _gameTap = this.data.tapTimes += 1
     }
 
     // 升级增加外圈颜色，避免切换到同色
@@ -180,10 +194,12 @@ Page({
       curColor = getNewColor(colors[matchIndex]); // 排除指针在当前角度指向的新颜色
     }
     direction = direction * -1; // 改变旋转方向
-    this.setData({
-      tapTimes: this.data.tapTimes,
-      level: this.data.level
-    });
+
+    // this.setData({
+    //   tapTimes: this.data.tapTimes,
+    //   level: this.data.level
+    // });
+
     // 记录游戏数据
     actionData.push({
       colors: JSON.parse(JSON.stringify(colors)),
@@ -200,13 +216,17 @@ Page({
     colors = allColors.slice(0, 3);
     curColor = getNewColor(colors[0]);
     mockPlaying = false;
+
     endGame();
     startGame();
+    
     // 设置显示数据
-    this.setData({
-      tapTimes: 0,
-      level: 1
-    });
+    _gameLevel = 1;
+    _gameTap = 0;
+    // this.setData({
+    //   tapTimes: 0,
+    //   level: 1
+    // });
     // 记录游戏数据
     actionData.length = 0;
     actionData.push({
@@ -217,6 +237,10 @@ Page({
   },
   playShow() {
     const _this = this;
+    const bestScoreStr = wx.getStorageSync('bestScore');
+    const _actionData = bestScoreStr && JSON.parse(bestScoreStr) || [];
+    actionData.length = 0;
+    _actionData.map(_ => actionData.push(_));
     if (actionData.length < 2 || speed) return;
     // 重置动画变量
     speed = initSpeed;
@@ -228,6 +252,8 @@ Page({
     mockPlaying = true; // 阻止点击影响重现
     clearInterval(mockPlay);
     startGame();
+    _gameLevel = 1;
+    _gameTap = 0;
     let mockIndex = 1;
     let mockPlay = setInterval(function () {
       if (!actionData[mockIndex]) {
@@ -242,6 +268,8 @@ Page({
         catchMatchColor = false;
         colors = actionData[mockIndex].colors;
         curColor = actionData[mockIndex].curColor;
+        _gameLevel = Math.floor(mockIndex / (levelUpLimit + 1)) + 1;
+        _gameTap = mockIndex % (levelUpLimit + 1);
         mockIndex += 1;
       }
       // 模拟停止
@@ -252,12 +280,13 @@ Page({
       }
     }, drawTimeStop);
   },
-  updateScore: function() {
+  updateScore: function(timeTake) {
     const lastScore = wx.getStorageSync('score')
     if (actionData.length < 5 || actionData.length < lastScore) {
-      console.log('poor result, Stop here')
+      // 'poor result, Stop here'
       return;
     }
+    // 记录最新成绩
     wx.setStorageSync('score', actionData.length)
     // 上传游戏得分
     const updateUrl = 'https://bala.so/wxapp/updateScore'
