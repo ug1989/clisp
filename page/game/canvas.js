@@ -18,7 +18,7 @@ let speed = 0;  // 当前旋转速度
 let catchMatchColor; // 是否开始记录错失区域
 let levelUpLimit = 3; // 成功 n+1 次升级
 let direction = 1; // 旋转方向 1 顺时针 -1 逆时针
-const initSpeed = 7;
+const initSpeed = 6;
 const drawTimeStop = 16.666;
 
 // 游戏数据
@@ -195,11 +195,6 @@ Page({
     }
     direction = direction * -1; // 改变旋转方向
 
-    // this.setData({
-    //   tapTimes: this.data.tapTimes,
-    //   level: this.data.level
-    // });
-
     // 记录游戏数据
     actionData.push({
       colors: JSON.parse(JSON.stringify(colors)),
@@ -223,10 +218,8 @@ Page({
     // 设置显示数据
     _gameLevel = 1;
     _gameTap = 0;
-    // this.setData({
-    //   tapTimes: 0,
-    //   level: 1
-    // });
+    this.data.tapTimes = 0;
+    this.data.level = 1;
     // 记录游戏数据
     actionData.length = 0;
     actionData.push({
