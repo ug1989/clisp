@@ -78,15 +78,13 @@ function draw() {
     ctx.setFillStyle(curColor)
     ctx.setFontSize(15)
     ctx.setTextAlign('center')
-    ctx.fillText('点击开始游戏', center, center - offsetTop * 1)
+    ctx.fillText('Touch to start..', center, center - offsetTop * 1)
   }
   ctx.setFillStyle('#ffffff')
   ctx.setFontSize(15)
   ctx.setTextAlign('center')
-  ctx.fillText(mockPlaying ? '游戏画面重放' : '指针进入同色弧形区域时点击', center, 2 * center + offsetTop * 1.2)
-
-  // 绘图  
-  ctx.draw()
+  let infoText = mockPlaying ? '游戏画面重放' : '指针进入同色弧形区域时点击'
+  ctx.fillText(infoText, center, 2 * center + offsetTop * 1.8)
 
   // 计算当前指针位置对应外圈颜色序号
   let matchIndex = (Math.floor((arcAngle + stepAngle / 2) / stepAngle) % colorNum + colorNum) % colorNum;
@@ -106,8 +104,20 @@ function draw() {
       _angle: _angle,
       stop: true
     })
+    if (_angle) {
+      let gameOverTextColor = getNewColor(curColor)
+      ctx.setFillStyle(gameOverTextColor)
+      ctx.setFontSize(15)
+      ctx.setTextAlign('center')
+      ctx.setShadow(0, 0, 3, '#ffffff')
+      ctx.fillText('Oops, game over..', center, center - offsetTop * 2)
+      ctx.fillText('Touch to restart..', center, center - offsetTop * 3.3)
+    }
     endGame();
-  };
+  }
+
+  // 绘图  
+  ctx.draw()
 }
 
 function getNewColor(curColor) {
@@ -130,7 +140,8 @@ function endGame() {
   }
   mockPlaying = false;
   actionData.length = 0;
-  clearInterval(drawAnimation)
+  gameEndTime = +new Date;
+  clearInterval(drawAnimation);
 }
 
 // 获取屏幕宽度
@@ -138,7 +149,7 @@ wx.getSystemInfo({
   success: function(res) {
     _width = res.screenWidth;
     center = Math.floor(_width / 2);
-    offsetTop = -0.06 * _width;
+    offsetTop = -0.04 * _width;
   },
 })
 
@@ -157,7 +168,7 @@ Page({
       return this.newGame()
     }
     // 准备重新开始
-    if (speed == 0 && !canStartGame) {
+    if (speed == 0 && !canStartGame && +new Date - gameEndTime > 1000) {
       this.freeStart();
     }
     // 点击在圆圈内有效
@@ -286,10 +297,8 @@ Page({
   },
   updateScore: function(timeTake) {
     const lastScore = wx.getStorageSync('score')
-    if (actionData.length < 5 || actionData.length < lastScore) {
-      // 'poor result, Stop here'
-      return;
-    }
+    this.setData({ showShare: actionData.length < 5 })
+    if (actionData.length < 5 || actionData.length < lastScore) return;
     // 记录最新成绩
     wx.setStorageSync('score', actionData.length)
     // 上传游戏得分

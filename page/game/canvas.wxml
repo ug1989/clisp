@@ -8,6 +8,7 @@
       disable-scroll="{{true}}"
     />
   </view>
+  <button open-type="share" hidden="{{showShare}}">SHARE</button>
   <view class="pkInfo">
     与队员 或 群友的成绩
     <view class="classname">{{shareUserId}}</view>
