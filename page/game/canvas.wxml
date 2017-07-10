@@ -7,8 +7,6 @@
       bindtouchend="noop"
       disable-scroll="{{true}}"
     />
-    <button class="retry" bindtap="freeStart">New Game</button>
-    <button class="retry" bindtap="playShow">Show Game</button>
   </view>
   <view class="pkInfo">
     与队员 或 群友的成绩

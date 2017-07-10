@@ -74,6 +74,12 @@ function draw() {
   ctx.stroke()
 
   // 文字提示
+  if (canStartGame) {
+    ctx.setFillStyle(curColor)
+    ctx.setFontSize(15)
+    ctx.setTextAlign('center')
+    ctx.fillText('点击开始游戏', center, center - offsetTop * 1)
+  }
   ctx.setFillStyle('#ffffff')
   ctx.setFontSize(15)
   ctx.setTextAlign('center')
@@ -125,9 +131,6 @@ function endGame() {
   mockPlaying = false;
   actionData.length = 0;
   clearInterval(drawAnimation)
-  // 初始化面
-  ctx.drawImage('../../image/tmg.jpg', 0, 0, _width, _width)
-  ctx.draw()
 }
 
 // 获取屏幕宽度
@@ -154,6 +157,9 @@ Page({
       return this.newGame()
     }
     // 准备重新开始
+    if (speed == 0 && !canStartGame) {
+      this.freeStart();
+    }
     // 点击在圆圈内有效
     // const touchPoint = e.touches[0];
     // const distance = Math.sqrt((center - touchPoint.x) * (center - touchPoint.x) + (center - touchPoint.y) * (center - touchPoint.y));
@@ -322,6 +328,11 @@ Page({
     // 初始化游戏数据
     ctx = wx.createCanvasContext('myCanvas')
     this.freeStart()
+    // 初始化面
+    false && setTimeout(function() {
+      ctx.drawImage('../../image/tmg.jpg', 0, 0, _width, _width)
+      ctx.draw()
+    }, 30)
   },
   // 根据shareUserID获取分享人的分数
   getShareInfo(id) {
@@ -332,6 +343,10 @@ Page({
         this.setData({
           shareUserId: id,
           shareScore: res.data
+        })
+        wx.showModal({
+          title: '',
+          content: (JSON.stringify(res.data)).substr(0, 123)
         })
       }
     })
@@ -346,8 +361,9 @@ Page({
           groupId: groupId,
           groupScore: res.data
         })
-        wx.showToast({
-          title: 'GSL' + res.data.length,
+        wx.showModal({
+          title: '',
+          content: (JSON.stringify(res.data)).substr(0, 123)
         })
       }
     })
@@ -359,7 +375,7 @@ Page({
     }
     const user = getApp().globalData.user
     return {
-      title: user.nickName + '邀你挑战《心灵手巧》',
+      title: user.nickName + ' -- 心灵手巧',
 			path: '/page/game/canvas?id=' + user._id,
       success: function (res) {
         const saveTicketUrl = 'https://bala.so/wxapp/saveShareTicket'
