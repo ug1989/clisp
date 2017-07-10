@@ -2,6 +2,7 @@
 let _width; // 屏幕宽度
 let ctx;    // 画布操作对象
 let center; // 画布中心坐标
+let offsetTop;
 const strokeWidth = 10; // 绘图宽度
 const allColors =  "Tomato,Turquoise,SteelBlue,Gold,BlueViolet,CornflowerBlue,Crimson,DarkCyan,DarkMagenta,DeepPink,DodgerBlue,ForestGreen,DarkOrange,LightSalmon,LightSeaGreen,Chocolate,MediumSlateBlue,Orange,OrangeRed,OliveDrab,Purple,PaleVioletRed,RoyalBlue,Salmon,SeaGreen,SandyBrown,SlateBlue,YellowGreen".split(','); // 可供选择的所有颜色
 let colors = []; // 当前实际展示的颜色
@@ -47,7 +48,7 @@ function draw() {
   // 背景圈
   ctx.beginPath()
   ctx.setFillStyle(bgColor)
-  ctx.arc(center, center, radius, 0, Math.PI * 2)
+  ctx.arc(center, center + offsetTop, radius, 0, Math.PI * 2)
   ctx.fill();
 
   // 画外圈
@@ -55,8 +56,12 @@ function draw() {
   while (index < colorNum) {
     ctx.beginPath()
     ctx.setStrokeStyle(colors[index])
-    ctx.arc(center, center, radius * 6 / 7, startAngle + spaceAngle, startAngle + stepAngle - spaceAngle)
+    ctx.arc(center, center + offsetTop, radius * 6 / 7, startAngle + spaceAngle, startAngle + stepAngle - spaceAngle)
     startAngle += stepAngle;
+
+		// ctx.setFillStyle(colors[index])
+    // ctx.fillRect(index * _width / colors.length, 0, _width / colors.length, 2 * strokeWidth)
+
     index += 1;
     ctx.stroke();
   }
@@ -64,20 +69,15 @@ function draw() {
   // 内部指针
   ctx.beginPath()
   ctx.setStrokeStyle(curColor)
-  ctx.moveTo(center, center)
-  ctx.lineTo(center + Math.cos(arcAngle) * needleLength, center + Math.sin(arcAngle) * needleLength)
+  ctx.moveTo(center, center + offsetTop)
+  ctx.lineTo(center + Math.cos(arcAngle) * needleLength, center + offsetTop + Math.sin(arcAngle) * needleLength)
   ctx.stroke()
 
   // 文字提示
   ctx.setFillStyle('#ffffff')
-  ctx.setFontSize(25)
+  ctx.setFontSize(15)
   ctx.setTextAlign('center')
-  ctx.fillText('第 ' + _gameLevel + ' 级    第 ' + (_gameLevel == 1 ? _gameTap : _gameTap + 1) + ' 击', center, 40)
-  if (canStartGame) {
-    ctx.setFontSize(15)
-    ctx.setTextAlign('center')
-    ctx.fillText(mockPlaying ? '游戏画面重放' : '指针进入同色弧形区域时点击', center, 2 * center - 20)
-  }
+  ctx.fillText(mockPlaying ? '游戏画面重放' : '指针进入同色弧形区域时点击', center, 2 * center + offsetTop * 1.2)
 
   // 绘图  
   ctx.draw()
@@ -125,6 +125,9 @@ function endGame() {
   mockPlaying = false;
   actionData.length = 0;
   clearInterval(drawAnimation)
+  // 初始化面
+  ctx.drawImage('../../image/tmg.jpg', 0, 0, _width, _width)
+  ctx.draw()
 }
 
 // 获取屏幕宽度
@@ -132,6 +135,7 @@ wx.getSystemInfo({
   success: function(res) {
     _width = res.screenWidth;
     center = Math.floor(_width / 2);
+    offsetTop = -0.06 * _width;
   },
 })
 
