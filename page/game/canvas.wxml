@@ -12,6 +12,8 @@
   </view>
   <view class="pkInfo">
     与队员 或 群友的成绩
+    <view class="classname">{{shareUserId}}</view>
+    <view class="classname">{{groupId}}</view>
   </view>
 </view>
 

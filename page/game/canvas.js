@@ -149,6 +149,7 @@ Page({
       canStartGame = false
       return this.newGame()
     }
+    // 准备重新开始
     // 点击在圆圈内有效
     // const touchPoint = e.touches[0];
     // const distance = Math.sqrt((center - touchPoint.x) * (center - touchPoint.x) + (center - touchPoint.y) * (center - touchPoint.y));
@@ -325,6 +326,7 @@ Page({
       url: reqUrl,
       success: (res) => {
         this.setData({
+          shareUserId: id,
           shareScore: res.data
         })
       }
@@ -337,6 +339,7 @@ Page({
       url: reqUrl,
       success: (res) => {
         this.setData({
+          groupId: groupId,
           groupScore: res.data
         })
         wx.showToast({
