@@ -76,7 +76,7 @@ function draw() {
   if (canStartGame) {
     ctx.setFontSize(15)
     ctx.setTextAlign('center')
-    ctx.fillText('指针进入同色弧形区域时点击', center, 2 * center - 20)
+    ctx.fillText(mockPlaying ? '游戏画面重放' : '指针进入同色弧形区域时点击', center, 2 * center - 20)
   }
 
   // 绘图  
