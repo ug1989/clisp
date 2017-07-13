@@ -352,7 +352,8 @@ Page({
     wx.request({
       url: reqUrl,
       success: (res) => {
-        !this.data.listScore.length && this.setData({
+        if (this.data.listScore.length) return;
+        this.setData({
           listScore: [res.data]
         })
       }
@@ -365,7 +366,9 @@ Page({
       url: reqUrl,
       success: (res) => {
         this.setData({
-          listScore: res.data
+          listScore: res.data.sort((b, a) => {
+            return a.score - b.score > 0 ? 1 : -1
+          })
         })
       }
     })
