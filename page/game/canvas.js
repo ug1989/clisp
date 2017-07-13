@@ -157,7 +157,8 @@ wx.getSystemInfo({
 Page({
   data: {
     level: 1,
-    tapTimes: 0
+    tapTimes: 0,
+    listScore: []
   },
   tap: function (e) {
     // 重现游戏中
@@ -316,6 +317,8 @@ Page({
           key: 'bestScore',
           data: JSON.stringify(res.data.data),
         })
+        // 获取最新排名
+        appInfo.openGId && this.getGroupScore(appInfo.openGId)
         getApp().globalData.bestScore = res.data.data
       }
     })
@@ -341,7 +344,7 @@ Page({
     false && setTimeout(function() {
       ctx.drawImage('../../image/tmg.jpg', 0, 0, _width, _width)
       ctx.draw()
-    }, 30)
+    }, 1200)
   },
   // 根据shareUserID获取分享人的分数
   getShareInfo(id) {
@@ -349,13 +352,8 @@ Page({
     wx.request({
       url: reqUrl,
       success: (res) => {
-        this.setData({
-          shareUserId: id,
-          shareScore: res.data
-        })
-        wx.showModal({
-          title: '',
-          content: (JSON.stringify(res.data)).substr(0, 123)
+        !this.data.listScore.length && this.setData({
+          listScore: [res.data]
         })
       }
     })
@@ -367,12 +365,7 @@ Page({
       url: reqUrl,
       success: (res) => {
         this.setData({
-          groupId: groupId,
-          groupScore: res.data
-        })
-        wx.showModal({
-          title: '',
-          content: (JSON.stringify(res.data)).substr(0, 123)
+          listScore: res.data
         })
       }
     })

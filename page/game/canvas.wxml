@@ -10,9 +10,10 @@
   </view>
   <button open-type="share" hidden="{{showShare}}">SHARE</button>
   <view class="pkInfo">
-    与队员 或 群友的成绩
-    <view class="classname">{{shareUserId}}</view>
-    <view class="classname">{{groupId}}</view>
+    <view wx:for="{{listScore}}" wx:for-index="idx" wx:for-item="item">
+      <image style="width: 100px; height: 100px; background-color: #eeeeee;" mode="aspectFit" src="{{item.user && item.user.avatarUrl}}"></image>
+      {{item.score}}
+    </view>
   </view>
 </view>
 
