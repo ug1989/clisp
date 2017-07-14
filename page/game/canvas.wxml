@@ -10,6 +10,7 @@
   </view>
   <button open-type="share" hidden="{{showShare}}">SHARE</button>
   <view class="pkInfo">
+    {{listScore.length}}
     <view wx:for="{{listScore}}" wx:key="listScore" wx:for-index="idx" wx:for-item="item">
       <image style="width: 50px; height: 50px; background-color: #eeeeee;" mode="aspectFit" src="{{item.user && item.user.avatarUrl}}"></image>
       {{item.score}}

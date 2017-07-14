@@ -386,17 +386,18 @@ Page({
           // 防止游戏过程中渲染页面，导致卡顿
           endGameAction = function () {
             _endGameAction && _endGameAction();
-            showListScores();
+            showGroupScores();
           }
         } else {
-          showListScores();
+          showGroupScores();
         }
 
         function showGroupScores() {
+          const sortList = res.data.sort((b, a) => {
+            return a.score - b.score > 0 ? 1 : -1
+          });
           _this.setData({
-            listScore: res.data.sort((b, a) => {
-              return a.score - b.score > 0 ? 1 : -1
-            })
+            listScore: res.data
           })
         }
       }
