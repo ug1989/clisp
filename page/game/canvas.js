@@ -352,10 +352,24 @@ Page({
     wx.request({
       url: reqUrl,
       success: (res) => {
-        if (this.data.listScore.length) return;
-        this.setData({
-          listScore: [res.data]
-        })
+        const _this = this;
+        let _endGameAction = endGameAction
+        if (!res.data || this.data.listScore.length) return;
+        if (gameStartTime) {
+          // 防止游戏过程中渲染页面，导致卡顿
+          endGameAction = function() {
+            _endGameAction && _endGameAction();
+            showShareScore();
+          }
+        } else {
+          showShareScore();
+        }
+
+        function showShareScore() {
+          _this.setData({
+            listScore: [res.data]
+          });
+        }
       }
     })
   },
@@ -365,11 +379,26 @@ Page({
     wx.request({
       url: reqUrl,
       success: (res) => {
-        this.setData({
-          listScore: res.data.sort((b, a) => {
-            return a.score - b.score > 0 ? 1 : -1
+        if (!res.data || !res.data.length) return;
+        const _this = this;
+        let _endGameAction = endGameAction
+        if (gameStartTime) {
+          // 防止游戏过程中渲染页面，导致卡顿
+          endGameAction = function () {
+            _endGameAction && _endGameAction();
+            showListScores();
+          }
+        } else {
+          showListScores();
+        }
+
+        function showGroupScores() {
+          _this.setData({
+            listScore: res.data.sort((b, a) => {
+              return a.score - b.score > 0 ? 1 : -1
+            })
           })
-        })
+        }
       }
     })
   },
