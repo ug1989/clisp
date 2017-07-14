@@ -298,8 +298,12 @@ Page({
   },
   updateScore: function(timeTake) {
     const lastScore = wx.getStorageSync('score')
+    const appInfo = getApp().globalData
     this.setData({ showShare: actionData.length < 5 })
-    if (actionData.length < 5 || actionData.length < lastScore) return;
+    if (actionData.length < Math.max(lastScore, 5)) {
+      _angle && appInfo.openGId && this.getGroupScore(appInfo.openGId);
+      return;
+    }
     // 记录最新成绩
     wx.setStorageSync('score', actionData.length)
     // 上传游戏得分
@@ -317,16 +321,18 @@ Page({
           key: 'bestScore',
           data: JSON.stringify(res.data.data),
         })
-        // 获取最新排名
-        appInfo.openGId && this.getGroupScore(appInfo.openGId)
         getApp().globalData.bestScore = res.data.data
+      },
+      complete: function () {
+        const appInfo = getApp().globalData
+        appInfo && appInfo.openGId && this.getGroupScore(appInfo.openGId)
       }
     })
   },
   onLoad: function (option) {
     const shareUserId = option && option.id
     shareUserId && this.getShareInfo(shareUserId)
-    endGameAction = this.updateScore.bind(this)
+    endGameAction = this.updateScore && this.updateScore.bind(this)
     const _this = this
     const appInfo = getApp().globalData
     // openGId 直接获取，不然等到获取信息后在获取
@@ -375,6 +381,9 @@ Page({
   },
   // 根据openId获取群聊游戏成绩
   getGroupScore: function (groupId) {
+    const lastReqTime = this.getGroupScore.lastReqTime;
+    if (+new Date - lastReqTime < 15 * 1000) return;
+    this.getGroupScore.lastReqTime = +new Date;
     const reqUrl = 'https://bala.so/wxapp/getScoreByGroup?groupId=' + groupId
     wx.request({
       url: reqUrl,
@@ -397,8 +406,8 @@ Page({
             return a.score - b.score > 0 ? 1 : -1
           });
           _this.setData({
-            listScore: res.data
-          })
+            listScore: sortList 
+          });
         }
       }
     })
