@@ -372,7 +372,7 @@ Page({
         }
 
         function showShareScore() {
-          _this.setData({
+          !_this.data.listScore.length && _this.setData({
             listScore: [res.data]
           });
         }
