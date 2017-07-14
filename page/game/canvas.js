@@ -158,6 +158,7 @@ Page({
   data: {
     level: 1,
     tapTimes: 0,
+    hideShare: true,
     listScore: []
   },
   tap: function (e) {
@@ -299,7 +300,7 @@ Page({
   updateScore: function(timeTake) {
     const lastScore = wx.getStorageSync('score')
     const appInfo = getApp().globalData
-    this.setData({ showShare: actionData.length < 5 })
+    this.setData({ hideShare: actionData.length < 5 })
     if (actionData.length < Math.max(lastScore, 5)) {
       _angle && appInfo.openGId && this.getGroupScore(appInfo.openGId);
       return;

@@ -8,7 +8,7 @@
       disable-scroll="{{true}}"
     />
   </view>
-  <button open-type="share" hidden="{{showShare}}">SHARE</button>
+  <button open-type="share" hidden="{{hideShare}}">SHARE</button>
   <view class="pkInfo">
     <view wx:for="{{listScore}}" wx:key="listScore" wx:for-index="idx" wx:for-item="item">
       <image style="width: 25px; height: 25px; background-color: #eeeeee;" mode="aspectFit" src="{{item.user && item.user.avatarUrl}}"></image>
