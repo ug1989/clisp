@@ -19,16 +19,18 @@
         <view class="pkDetail">
           <view class="pkNmae">
             {{item.user && item.user.nickName}}
-            <text class="pkLevel" hidden="{{!item.level}}">{{item.level + 1}}阶{{item.score % 4 + 1}}段</text>
+            <text wx:if="{{false}}" class="pkLevel">
+              {{item.user && item.user.country}} 
+              {{item.user && item.user.province}} 
+              {{item.user && item.user.city}}
+            </text>
           </view>
-          <view class="pkAddress">
-            {{item.user && item.user.country}} 
-            {{item.user && item.user.province}} 
-            {{item.user && item.user.city}}
+          <view class="pkAddress" hidden="{{item.level < 3}}">
+            {{levelInChinese[item.level - 2] && levelInChinese[item.level - 2] || item.level - 2}}阶{{levelInChinese[(item.score - 2) % 4 + 1]}}段
           </view>
         </view>
       </view>
-      <view class="shareButton">
+      <view class="shareButton" hidden="{{listScore.length == 0}}">
         <button bindtap="sharePrevent" class="pkShare" id="{{item.user && item.user._id}}" open-type="share"></button>
         <image class="shareImage" style="background: teal" mode="aspectFill" src="../../image/share.png"></image>
       </view>

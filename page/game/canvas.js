@@ -166,31 +166,43 @@ const mockListScore = [
   //   user: {
   //     nickName: '曹帅', avatarUrl: 'http://p1.music.126.net/PRSSBKKHVXqg9dEonAnwoQ==/109951162954605499.jpg?param=140y140', country: 'CN', province: 'Shanghai', city: 'Pudong', _id: 1
   //   },
-  //   level: Math.floor(26 / (levelUpLimit + 1)),
-  //   score: 26
+  //   level: 2 + Math.floor((9 - 2) / (levelUpLimit + 1)),
+  //   score: 9
+  // },{
+  //   user: {
+  //     nickName: '曹帅', avatarUrl: 'http://p1.music.126.net/PRSSBKKHVXqg9dEonAnwoQ==/109951162954605499.jpg?param=140y140', country: 'CN', province: 'Shanghai', city: 'Pudong', _id: 1
+  //   },
+  //   level: 2 + Math.floor((8 - 2) / (levelUpLimit + 1)),
+  //   score: 8
   // },
   // {
   //   user: {
   //     nickName: '没撒的撒', avatarUrl: 'http://p1.music.126.net/lbJCfzq6Jm60K6kzP_LtlQ==/18953381439796470.jpg?param=140y140', country: 'CN', province: 'Jiangsu', city: 'Nanjing', _id: 2
   //   },
-  //   level: Math.floor(25 / (levelUpLimit + 1)),
-  //   score: 25
+  //   level: 2 + Math.floor((7 - 2) / (levelUpLimit + 1)),
+  //   score: 7
   // },
   // {
   //   user: {
   //     nickName: 'micks', avatarUrl: 'http://p1.music.126.net/LOEH8DU92vx2GJc0tX1xsA==/109951162971666277.jpg?param=140y140', country: 'CN', province: 'Hebei', city: 'Wuhan', _id: 3
   //   },
-  //   level: Math.floor(24 / (levelUpLimit + 1)),
-  //   score: 24
-  // },
-  // {
-  //   user: {
-  //     nickName: 'sadsaCC', avatarUrl: 'http://p1.music.126.net/ZM7Vn0K04_jtbpzwm05jGw==/19228259346767883.jpg?param=140y140', country: 'CN', province: 'Ningxia', city: 'Guyuan', _id: 4
-  //   },
-  //   level: Math.floor(23 / (levelUpLimit + 1)),
-  //   score: 23
+  //   level: 2 + Math.floor((6 - 2) / (levelUpLimit + 1)),
+  //   score: 6
   // }
 ]
+
+const hanzs = {
+  '1': '一',
+  '2': '二',
+  '3': '三',
+  '4': '四',
+  '5': '五',
+  '6': '六',
+  '7': '七',
+  '8': '八',
+  '9': '九',
+  '10': '十'
+}
 
 // 定义页面内容
 Page({
@@ -201,6 +213,7 @@ Page({
     allColors: allColors,
     listScore: mockListScore,
     scrollHeight: _height - _width,
+    levelInChinese: hanzs,
     coverView: wx.canIUse('cover-view')
   },
   tap (e) {
@@ -215,10 +228,7 @@ Page({
     if (speed == 0 && !canStartGame && +new Date - gameEndTime > 1000) {
       this.freeStart();
     }
-    // 点击在圆圈内有效
-    // const touchPoint = e.touches[0];
-    // const distance = Math.sqrt((center - touchPoint.x) * (center - touchPoint.x) + (center - touchPoint.y) * (center - touchPoint.y));
-    // distance < center * radiusScale && this.reverse();
+    
     this.reverse();
   },
   freeStart () {
@@ -340,7 +350,6 @@ Page({
     }, drawTimeStop);
   },
   updateScore (timeTake) {
-    console.log(this.data.level)
     const lastScore = wx.getStorageSync('score')
     const appInfo = getApp().globalData
     this.setData({ hideShare: actionData.length < 5 });
