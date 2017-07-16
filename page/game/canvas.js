@@ -5,7 +5,7 @@ let ctx;    // 画布操作对象
 let center; // 画布中心坐标
 let offsetTop;
 const strokeWidth = 10; // 绘图宽度
-const allColors = "Tomato,Turquoise,SteelBlue,Gold,BlueViolet,Orange,ForestGreen,CornflowerBlue,DeepPink,YellowGreen,Crimson,DodgerBlue,DarkMagenta,LightSeaGreen,Chocolate".split(','); // 可供选择的所有颜色
+const allColors = "Tomato,Turquoise,SteelBlue,Gold,BlueViolet,CornflowerBlue,Crimson,DarkCyan,DarkMagenta,DeepPink,DodgerBlue,ForestGreen,DarkOrange,LightSalmon,LightSeaGreen,Chocolate,MediumSlateBlue,Orange,OrangeRed,OliveDrab,Purple,PaleVioletRed,RoyalBlue,Salmon,SeaGreen,SandyBrown,SlateBlue,YellowGreen".split(','); // 可供选择的所有颜色
 let colors = []; // 当前实际展示的颜色
 const bgColor = '#ffffff';
 const radiusScale = 0.7;  // 圆形区域尺寸所占比例
@@ -162,34 +162,34 @@ wx.getSystemInfo({
 });
 
 const mockListScore = [
-  {
-    user: {
-      nickName: '曹帅', avatarUrl: 'http://p1.music.126.net/PRSSBKKHVXqg9dEonAnwoQ==/109951162954605499.jpg?param=140y140', country: 'CN', province: 'Shanghai', city: 'Pudong', _id: 1
-    },
-    level: Math.floor(26 / (levelUpLimit + 1)),
-    score: 26
-  },
-  {
-    user: {
-      nickName: '没撒的撒', avatarUrl: 'http://p1.music.126.net/lbJCfzq6Jm60K6kzP_LtlQ==/18953381439796470.jpg?param=140y140', country: 'CN', province: 'Jiangsu', city: 'Nanjing', _id: 2
-    },
-    level: Math.floor(22 / (levelUpLimit + 1)),
-    score: 22
-  },
-  {
-    user: {
-      nickName: 'micks', avatarUrl: 'http://p1.music.126.net/LOEH8DU92vx2GJc0tX1xsA==/109951162971666277.jpg?param=140y140', country: 'CN', province: 'Hebei', city: 'Wuhan', _id: 3
-    },
-    level: Math.floor(20 / (levelUpLimit + 1)),
-    score: 20
-  },
-  {
-    user: {
-      nickName: 'sadsaCC', avatarUrl: 'http://p1.music.126.net/ZM7Vn0K04_jtbpzwm05jGw==/19228259346767883.jpg?param=140y140', country: 'CN', province: 'Ningxia', city: 'Guyuan', _id: 4
-    },
-    level: Math.floor(19 / (levelUpLimit + 1)),
-    score: 19
-  }
+  // {
+  //   user: {
+  //     nickName: '曹帅', avatarUrl: 'http://p1.music.126.net/PRSSBKKHVXqg9dEonAnwoQ==/109951162954605499.jpg?param=140y140', country: 'CN', province: 'Shanghai', city: 'Pudong', _id: 1
+  //   },
+  //   level: Math.floor(26 / (levelUpLimit + 1)),
+  //   score: 26
+  // },
+  // {
+  //   user: {
+  //     nickName: '没撒的撒', avatarUrl: 'http://p1.music.126.net/lbJCfzq6Jm60K6kzP_LtlQ==/18953381439796470.jpg?param=140y140', country: 'CN', province: 'Jiangsu', city: 'Nanjing', _id: 2
+  //   },
+  //   level: Math.floor(22 / (levelUpLimit + 1)),
+  //   score: 22
+  // },
+  // {
+  //   user: {
+  //     nickName: 'micks', avatarUrl: 'http://p1.music.126.net/LOEH8DU92vx2GJc0tX1xsA==/109951162971666277.jpg?param=140y140', country: 'CN', province: 'Hebei', city: 'Wuhan', _id: 3
+  //   },
+  //   level: Math.floor(20 / (levelUpLimit + 1)),
+  //   score: 20
+  // },
+  // {
+  //   user: {
+  //     nickName: 'sadsaCC', avatarUrl: 'http://p1.music.126.net/ZM7Vn0K04_jtbpzwm05jGw==/19228259346767883.jpg?param=140y140', country: 'CN', province: 'Ningxia', city: 'Guyuan', _id: 4
+  //   },
+  //   level: Math.floor(19 / (levelUpLimit + 1)),
+  //   score: 19
+  // }
 ]
 
 // 定义页面内容
