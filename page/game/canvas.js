@@ -173,22 +173,22 @@ const mockListScore = [
   //   user: {
   //     nickName: '没撒的撒', avatarUrl: 'http://p1.music.126.net/lbJCfzq6Jm60K6kzP_LtlQ==/18953381439796470.jpg?param=140y140', country: 'CN', province: 'Jiangsu', city: 'Nanjing', _id: 2
   //   },
-  //   level: Math.floor(22 / (levelUpLimit + 1)),
-  //   score: 22
+  //   level: Math.floor(25 / (levelUpLimit + 1)),
+  //   score: 25
   // },
   // {
   //   user: {
   //     nickName: 'micks', avatarUrl: 'http://p1.music.126.net/LOEH8DU92vx2GJc0tX1xsA==/109951162971666277.jpg?param=140y140', country: 'CN', province: 'Hebei', city: 'Wuhan', _id: 3
   //   },
-  //   level: Math.floor(20 / (levelUpLimit + 1)),
-  //   score: 20
+  //   level: Math.floor(24 / (levelUpLimit + 1)),
+  //   score: 24
   // },
   // {
   //   user: {
   //     nickName: 'sadsaCC', avatarUrl: 'http://p1.music.126.net/ZM7Vn0K04_jtbpzwm05jGw==/19228259346767883.jpg?param=140y140', country: 'CN', province: 'Ningxia', city: 'Guyuan', _id: 4
   //   },
-  //   level: Math.floor(19 / (levelUpLimit + 1)),
-  //   score: 19
+  //   level: Math.floor(23 / (levelUpLimit + 1)),
+  //   score: 23
   // }
 ]
 
@@ -199,7 +199,7 @@ Page({
     tapTimes: 0,
     hideShare: true,
     allColors: allColors,
-    listScore: [] || mockListScore,
+    listScore: mockListScore,
     scrollHeight: _height - _width,
     coverView: wx.canIUse('cover-view')
   },
@@ -340,6 +340,7 @@ Page({
     }, drawTimeStop);
   },
   updateScore (timeTake) {
+    console.log(this.data.level)
     const lastScore = wx.getStorageSync('score')
     const appInfo = getApp().globalData
     this.setData({ hideShare: actionData.length < 5 });
@@ -373,8 +374,9 @@ Page({
       }
     });
     user && wx.showToast({
-      title: 'New Record !!',
-      duration: 2000
+      title: 'Good Job !!',
+      duration: 2000,
+      mask: true
     });
     user && !this.data.shareUserId && this.setData({
       listScore: [this.getCurUserScore()]
@@ -399,11 +401,14 @@ Page({
   onLoad(option) {
     const appInfo = getApp().globalData
     const shareUserId = option && option.id
+    const setCurUserBest = () => {
+      this.setData({
+        listScore: [this.getCurUserScore()]
+      })
+    }
     this.data.shareUserId = shareUserId
     this.data.openGId = appInfo.openGId
-    shareUserId ? this.getShareInfo(shareUserId) : appInfo.user && this.setData({
-      listScore: [this.getCurUserScore()]
-    })
+    shareUserId ? this.getShareInfo(shareUserId) : appInfo.user ? setCurUserBest() : appInfo.getInfoWithUserId = setCurUserBest
     // bind updateScore when endGame
     endGameAction = this.updateScore && this.updateScore.bind(this)
     // openGId 直接获取，不然等到获取信息后在获取

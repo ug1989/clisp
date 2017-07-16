@@ -25,6 +25,7 @@ App({
   },
   wxLogin: function () {
     const _this = this
+    const appInfo = this.globalData
     // 获取wxapp登录凭证，拿到openId创建或更新用户
     wx.login({
       success: function (res) {
@@ -54,6 +55,7 @@ App({
                     if (res.data) {
                       wx.setStorageSync('user', res.data)
                       _this.globalData.user = res.data
+                      appInfo.getInfoWithUserId && appInfo.getInfoWithUserId()
                       _this.joinGroup()
                     }
                   }

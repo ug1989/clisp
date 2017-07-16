@@ -55,6 +55,10 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+.pkLevel {
+  color: #666666;
+  font-size: .65em;
+}
 .pkAddress {
   position: absolute;
   top: 60rpx;
@@ -85,29 +89,6 @@
   top: 0rpx;
   left: 185rpx;
 }
-.pkShare {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 120rpx;
-  height: 120rpx;
-  line-height: 120rpx;
-  padding: 0;
-  margin: 0;
-  font-size: 46rpx;
-  background: transparent;
-  z-index: 1;
-}
-.shareImage {
-  width: 40rpx;
-  height: 40rpx;
-  position: absolute;
-  top: 40rpx;
-  right: 40rpx;
-}
-.pkShare::after {
-  content: none;
-}
 .pkItem:first-child .pkDetail {
   position: absolute;
   left: 350rpx;
@@ -115,4 +96,30 @@
 }
 .pkItem:last-child {
   border-bottom: none;
+}
+
+.shareButton {
+  position: fixed;
+  bottom: 20rpx;
+  right: 20rpx;
+  width: 100rpx;
+  height: 100rpx;
+}
+.pkShare {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  z-index: 1;
+}
+.pkShare::after {
+  content: none;
+}
+.shareImage {
+  width: 65%;
+  height: 65%;
 }
