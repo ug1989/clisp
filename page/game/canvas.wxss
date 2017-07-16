@@ -1,10 +1,118 @@
+.page-body {
+  position: relative;
+}
 .canvas {
   width: 100%;
   height: 0;
   padding-bottom: 100%;
   background-color: teal;
 }
-.retry {
-  width: 80%;
-  margin-left: 10%;
+.pkItem {
+  height: 120rpx;
+  background: #ffffff;
+  border-bottom: 1rpx solid #eeeeee;
+  position: relative;
+}
+.pkIndex {
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  width: 120rpx;
+  height: 100%;
+  color: #ffffff;
+}
+.pkIndex text {
+  position: absolute;
+  left: 0;
+  top: 40rpx;
+  min-width: 80%;
+  height: 50rpx;
+  line-height: 50rpx;
+  padding: 0 15rpx; 
+  border-top-right-radius: 25rpx;
+  border-bottom-right-radius: 25rpx;
+  white-space: nowrap;
+}
+.pkImage {
+  position: absolute;  
+  top: 20rpx; 
+  left: 170rpx;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+}
+.pkDetail {
+  position: absolute;
+  top: 0;
+  height: 120rpx;
+  left: 280rpx;
+}
+.pkNmae {
+  position: absolute;
+  top: 30rpx;
+  height: 30rpx;
+  line-height: 30rpx;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.pkAddress {
+  position: absolute;
+  top: 60rpx;
+  color: #777777;
+  height: 60rpx;
+  font-size: .6em;
+  line-height: 60rpx;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.pkItem:first-child {
+  height: 220rpx;
+  line-height: 220rpx;
+}
+.pkItem:first-child .pkIndex{
+  top: 50rpx;
+}
+.pkItem:first-child .pkImage {
+  top: 70rpx;
+  left: 185rpx;
+  width: 120rpx;
+  height: 120rpx;
+}
+.kingHeader {
+  width: 120rpx;
+  height: 120rpx;
+  position: absolute;
+  top: 0rpx;
+  left: 185rpx;
+}
+.pkShare {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 120rpx;
+  height: 120rpx;
+  line-height: 120rpx;
+  padding: 0;
+  margin: 0;
+  font-size: 46rpx;
+  background: transparent;
+  z-index: 1;
+}
+.shareImage {
+  width: 40rpx;
+  height: 40rpx;
+  position: absolute;
+  top: 40rpx;
+  right: 40rpx;
+}
+.pkShare::after {
+  content: none;
+}
+.pkItem:first-child .pkDetail {
+  position: absolute;
+  left: 350rpx;
+  top: 75rpx;
+}
+.pkItem:last-child {
+  border-bottom: none;
 }

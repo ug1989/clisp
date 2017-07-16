@@ -1,8 +1,6 @@
 {
   "pages": [
-    "page/game/canvas",
-    "page/test/index",
-    "page/user/index"
+    "page/game/canvas"
   ],
   "window": {
     "navigationBarTextStyle": "black",

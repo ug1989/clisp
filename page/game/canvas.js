@@ -1,10 +1,11 @@
 // 界面颜色及尺寸
 let _width; // 屏幕宽度
+let _height; // 屏幕宽度
 let ctx;    // 画布操作对象
 let center; // 画布中心坐标
 let offsetTop;
 const strokeWidth = 10; // 绘图宽度
-const allColors =  "Tomato,Turquoise,SteelBlue,Gold,BlueViolet,CornflowerBlue,Crimson,DarkCyan,DarkMagenta,DeepPink,DodgerBlue,ForestGreen,DarkOrange,LightSalmon,LightSeaGreen,Chocolate,MediumSlateBlue,Orange,OrangeRed,OliveDrab,Purple,PaleVioletRed,RoyalBlue,Salmon,SeaGreen,SandyBrown,SlateBlue,YellowGreen".split(','); // 可供选择的所有颜色
+const allColors = "Tomato,Turquoise,SteelBlue,Gold,BlueViolet,Orange,ForestGreen,CornflowerBlue,DeepPink,YellowGreen,Crimson,DodgerBlue,DarkMagenta,LightSeaGreen,Chocolate".split(','); // 可供选择的所有颜色
 let colors = []; // 当前实际展示的颜色
 const bgColor = '#ffffff';
 const radiusScale = 0.7;  // 圆形区域尺寸所占比例
@@ -50,6 +51,12 @@ function draw() {
   ctx.setFillStyle(bgColor)
   ctx.arc(center, center + offsetTop, radius, 0, Math.PI * 2)
   ctx.fill();
+
+  // 显示分数
+  ctx.setFillStyle('#0a8888')
+  ctx.setFontSize(15)
+  ctx.setTextAlign('center')
+  ctx.fillText(actionData.length + '', 20, 28)
 
   // 画外圈
   let index = 0;
@@ -146,12 +153,44 @@ function endGame() {
 
 // 获取屏幕宽度
 wx.getSystemInfo({
-  success: function(res) {
+  success: (res) => {
     _width = res.screenWidth;
+    _height = res.windowHeight;
     center = Math.floor(_width / 2);
     offsetTop = -0.04 * _width;
   },
-})
+});
+
+const mockListScore = [
+  {
+    user: {
+      nickName: '曹帅', avatarUrl: 'http://p1.music.126.net/PRSSBKKHVXqg9dEonAnwoQ==/109951162954605499.jpg?param=140y140', country: 'CN', province: 'Shanghai', city: 'Pudong', _id: 1
+    },
+    level: Math.floor(26 / (levelUpLimit + 1)),
+    score: 26
+  },
+  {
+    user: {
+      nickName: '没撒的撒', avatarUrl: 'http://p1.music.126.net/lbJCfzq6Jm60K6kzP_LtlQ==/18953381439796470.jpg?param=140y140', country: 'CN', province: 'Jiangsu', city: 'Nanjing', _id: 2
+    },
+    level: Math.floor(22 / (levelUpLimit + 1)),
+    score: 22
+  },
+  {
+    user: {
+      nickName: 'micks', avatarUrl: 'http://p1.music.126.net/LOEH8DU92vx2GJc0tX1xsA==/109951162971666277.jpg?param=140y140', country: 'CN', province: 'Hebei', city: 'Wuhan', _id: 3
+    },
+    level: Math.floor(20 / (levelUpLimit + 1)),
+    score: 20
+  },
+  {
+    user: {
+      nickName: 'sadsaCC', avatarUrl: 'http://p1.music.126.net/ZM7Vn0K04_jtbpzwm05jGw==/19228259346767883.jpg?param=140y140', country: 'CN', province: 'Ningxia', city: 'Guyuan', _id: 4
+    },
+    level: Math.floor(19 / (levelUpLimit + 1)),
+    score: 19
+  }
+]
 
 // 定义页面内容
 Page({
@@ -159,9 +198,12 @@ Page({
     level: 1,
     tapTimes: 0,
     hideShare: true,
-    listScore: []
+    allColors: allColors,
+    listScore: [] || mockListScore,
+    scrollHeight: _height - _width,
+    coverView: wx.canIUse('cover-view')
   },
-  tap: function (e) {
+  tap (e) {
     // 重现游戏中
     if (mockPlaying) return;
     // 点击开始游戏
@@ -179,14 +221,14 @@ Page({
     // distance < center * radiusScale && this.reverse();
     this.reverse();
   },
-  freeStart: function() {
+  freeStart () {
     // 设置开始游戏准备,但不开始游戏
     canStartGame = true
     this.newGame()
     curColor = allColors[0]
     speed = 0
   },
-  reverse: function() {
+  reverse () {
     if (!speed) return;
 
     // 非反转区域
@@ -226,7 +268,7 @@ Page({
       _angle: _angle
     });
   },
-  newGame: function() {
+  newGame () {
     // 重置动画变量
     speed = initSpeed;
     _angle = 0;
@@ -272,7 +314,7 @@ Page({
     _gameLevel = 1;
     _gameTap = 0;
     let mockIndex = 1;
-    let mockPlay = setInterval(function () {
+    let mockPlay = setInterval(() => {
       if (!actionData[mockIndex]) {
         clearInterval(mockPlay);
         return
@@ -297,10 +339,10 @@ Page({
       }
     }, drawTimeStop);
   },
-  updateScore: function(timeTake) {
+  updateScore (timeTake) {
     const lastScore = wx.getStorageSync('score')
     const appInfo = getApp().globalData
-    this.setData({ hideShare: actionData.length < 5 })
+    this.setData({ hideShare: actionData.length < 5 });
     if (actionData.length < Math.max(lastScore, 5)) {
       _angle && appInfo.openGId && this.getGroupScore(appInfo.openGId);
       return;
@@ -309,7 +351,7 @@ Page({
     wx.setStorageSync('score', actionData.length)
     // 上传游戏得分
     const updateUrl = 'https://bala.so/wxapp/updateScore'
-    const user = getApp().globalData.user
+    const user = appInfo.user
     user && wx.request({
       url: updateUrl,
       method: 'POST',
@@ -317,25 +359,53 @@ Page({
         data: actionData,
         user: user
       },
-      success: function(res) {
+      success: (res) => {
         wx.setStorage({
           key: 'bestScore',
           data: JSON.stringify(res.data.data),
         })
-        getApp().globalData.bestScore = res.data.data
+        appInfo.bestScore = res.data.data
       },
-      complete: function () {
+      complete: () => {
         const appInfo = getApp().globalData
-        appInfo && appInfo.openGId && this.getGroupScore(appInfo.openGId)
+        appInfo.openGId && this.getGroupScore(appInfo.openGId)
+        !appInfo.openGId && this.data.shareUserId && this.getShareInfo(this.data.shareUserId)
       }
-    })
+    });
+    user && wx.showToast({
+      title: 'New Record !!',
+      duration: 2000
+    });
+    user && !this.data.shareUserId && this.setData({
+      listScore: [this.getCurUserScore()]
+    });
+    !user && wx.showToast({
+      title: "　　获取认证信息失败，删除小程序后重新打开可进行授权。　",
+      duration: 5000,
+      image: '../../image/fe.png',
+      mask: true
+    });
   },
-  onLoad: function (option) {
-    const shareUserId = option && option.id
-    shareUserId && this.getShareInfo(shareUserId)
-    endGameAction = this.updateScore && this.updateScore.bind(this)
-    const _this = this
+  getCurUserScore() {
     const appInfo = getApp().globalData
+    const lastScore = wx.getStorageSync('score')
+    const mockUserScore = {
+      user: appInfo.user,
+      level: lastScore && (2 + Math.floor((lastScore - 2) / (levelUpLimit + 1))),
+      score: lastScore
+    }
+    return appInfo.user ? mockUserScore : null
+  },
+  onLoad(option) {
+    const appInfo = getApp().globalData
+    const shareUserId = option && option.id
+    this.data.shareUserId = shareUserId
+    this.data.openGId = appInfo.openGId
+    shareUserId ? this.getShareInfo(shareUserId) : appInfo.user && this.setData({
+      listScore: [this.getCurUserScore()]
+    })
+    // bind updateScore when endGame
+    endGameAction = this.updateScore && this.updateScore.bind(this)
     // openGId 直接获取，不然等到获取信息后在获取
     appInfo.openGId
       ? this.getGroupScore(appInfo.openGId)
@@ -347,11 +417,6 @@ Page({
     // 初始化游戏数据
     ctx = wx.createCanvasContext('myCanvas')
     this.freeStart()
-    // 初始化面
-    false && setTimeout(function() {
-      ctx.drawImage('../../image/tmg.jpg', 0, 0, _width, _width)
-      ctx.draw()
-    }, 1200)
   },
   // 根据shareUserID获取分享人的分数
   getShareInfo(id) {
@@ -361,27 +426,39 @@ Page({
       success: (res) => {
         const _this = this;
         let _endGameAction = endGameAction
-        if (!res.data || this.data.listScore.length) return;
+        if (!res.data) return;
         if (gameStartTime) {
           // 防止游戏过程中渲染页面，导致卡顿
-          endGameAction = function() {
+          endGameAction = () => {
             _endGameAction && _endGameAction();
             showShareScore();
+            endGameAction = _endGameAction;
           }
         } else {
           showShareScore();
         }
 
         function showShareScore() {
-          !_this.data.listScore.length && _this.setData({
-            listScore: [res.data]
+          const curUserScore = _this.getCurUserScore()
+          const diffUser = curUserScore && curUserScore.user._id != res.data.user._id
+          res.data.user && (res.data.level = 2 + Math.floor((res.data.score - 2) / (levelUpLimit + 1)))
+          const listScores = [res.data];
+          diffUser && listScores.push(curUserScore);
+          listScores.map(_ => {
+            _.user && (_.level = 2 + Math.floor((_.score - 2) / (levelUpLimit + 1)))
+          });
+          listScores.sort((b, a) => {
+            return a.score - b.score > 0 ? 1 : -1
+          });
+          !_this.data.openGId && _this.setData({
+            listScore: listScores
           });
         }
       }
     })
   },
   // 根据openId获取群聊游戏成绩
-  getGroupScore: function (groupId) {
+  getGroupScore (groupId) {
     const lastReqTime = this.getGroupScore.lastReqTime;
     if (+new Date - lastReqTime < 15 * 1000) return;
     this.getGroupScore.lastReqTime = +new Date;
@@ -394,9 +471,10 @@ Page({
         let _endGameAction = endGameAction
         if (gameStartTime) {
           // 防止游戏过程中渲染页面，导致卡顿
-          endGameAction = function () {
+          endGameAction = () => {
             _endGameAction && _endGameAction();
             showGroupScores();
+            endGameAction = _endGameAction;
           }
         } else {
           showGroupScores();
@@ -406,6 +484,9 @@ Page({
           const sortList = res.data.sort((b, a) => {
             return a.score - b.score > 0 ? 1 : -1
           });
+          sortList.map(_ => {
+            _.user && (_.level = 2 + Math.floor((_.score - 2) / (levelUpLimit + 1)))
+          });
           _this.setData({
             listScore: sortList 
           });
@@ -413,16 +494,19 @@ Page({
       }
     })
   },
-  onShareAppMessage: function (res) {
-    // 分享配置
+  onShareAppMessage (res) {
+    let _shareId, _shareUser
     if (res.from === 'button') {
-      console.log(res.target)
+      _shareId = res.target && res.target.id
+      _shareId && this.data.listScore.map(_ => {
+        _.user && _.user._id == _shareId && (_shareUser = _.user);
+      })
     }
     const user = getApp().globalData.user
     return {
-      title: user.nickName + ' -- 心灵手巧',
+      title: (_shareUser && user._id != _shareUser._id ? user.nickName + '携手' + _shareUser.nickName : user.nickName) + '邀你一起《眼疾手快》',
 			path: '/page/game/canvas?id=' + user._id,
-      success: function (res) {
+      success: (res) => {
         const saveTicketUrl = 'https://bala.so/wxapp/saveShareTicket'
         const shareTicket = res.shareTickets[0]
         const user = getApp().globalData.user
@@ -434,18 +518,24 @@ Page({
             userId: user._id,
             shareTicket: shareTicket
           },
-          success: function(res) {
-            // request ok
-          }
+          success: (res) => {}
         })
       },
-      fail: function(res) { }
+      fail: (res) => { }
     }
   },
-  onUnload: function() {
+  sharePrevent() {
+    if (wx.canIUse('button.open-type.share')) return
+    wx.showModal({
+      title: '温馨提示',
+      content: '　　你所使用微信版本暂不支持直接分享，请点击右上角分享或更新微信。',
+      showCancel: false
+    });
+  },
+  onUnload() {
     ctx = null;
     endGameAction = null;
     endGame();
   },
-  noop: function (e) { }
+  noop(e) { }
 })

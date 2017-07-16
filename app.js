@@ -1,5 +1,5 @@
 const loginFailInfo = function() {
-  const alertMsg = "　　获取登录信息失败，部分功能可能受限，删除小程序重新进入可更新授权。"
+  const alertMsg = "　　获取登录信息失败！如需登录，删除小程序重新打开进行授权。"
   wx.showModal({
     content: alertMsg,
     showCancel: false,

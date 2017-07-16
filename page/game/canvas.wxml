@@ -8,13 +8,27 @@
       disable-scroll="{{true}}"
     />
   </view>
-  <button open-type="share" hidden="{{hideShare}}">SHARE</button>
-  <view class="pkInfo">
-    <view wx:for="{{listScore}}" wx:key="listScore" wx:for-index="idx" wx:for-item="item">
-      <image style="width: 25px; height: 25px; background-color: #eeeeee;" mode="aspectFit" src="{{item.user && item.user.avatarUrl}}"></image>
-      {{item.score}}
+  <scroll-view scroll-y="hidden" style="height: {{scrollHeight}}px;">
+    <view class="pkInfo">
+      <view class="pkItem" wx:for="{{listScore}}" wx:key="listScore" wx:for-index="idx" wx:for-item="item">
+        <view class="pkIndex">
+          <text style="background: {{allColors[item.level] || 'gold'}}">NO. {{idx + 1}}</text>
+        </view>
+        <image class="pkImage" mode="aspectFill" src="{{item.user && item.user.avatarUrl}}"></image>
+        <image class="kingHeader" wx:if="{{idx == 0}}" src="../../image/king.png"></image>
+        <button bindtap="sharePrevent" class="pkShare" id="{{item.user && item.user._id}}" open-type="share"></button>
+        <image class="shareImage" style="background: {{allColors[item.level] || 'gold'}}" mode="aspectFill" src="../../image/share.png"></image>
+        <view class="pkDetail">
+          <view class="pkNmae">{{item.user && item.user.nickName}}</view>
+          <view class="pkAddress">
+            {{item.user && item.user.country}} 
+            {{item.user && item.user.province}} 
+            {{item.user && item.user.city}}
+          </view>
+        </view>
+      </view>
     </view>
-  </view>
+  </scroll-view>
 </view>
 
 
