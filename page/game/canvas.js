@@ -212,7 +212,6 @@ Page({
   data: {
     level: 1,
     tapTimes: 0,
-    hideShare: true,
     allColors: allColors,
     listScore: mockListScore,
     scrollHeight: _height - _width,
@@ -355,8 +354,7 @@ Page({
   updateScore (timeTake) {
     const lastScore = wx.getStorageSync('score')
     const appInfo = getApp().globalData
-    this.setData({ hideShare: actionData.length < 5 });
-    if (actionData.length < Math.max(lastScore, 5)) {
+    if (actionData.length < Math.max(lastScore, 4)) {
       _angle && appInfo.openGId && this.getGroupScore(appInfo.openGId);
       return;
     }
@@ -381,18 +379,20 @@ Page({
       },
       complete: () => {
         const appInfo = getApp().globalData
-        appInfo.openGId && this.getGroupScore(appInfo.openGId)
-        !appInfo.openGId && this.data.shareUserId && this.getShareInfo(this.data.shareUserId)
+        appInfo.openGId ? this.getGroupScore(appInfo.openGId) : this.data.shareUserId && this.getShareInfo(this.data.shareUserId)
       }
     });
+    // 新记录提示
     user && wx.showToast({
       title: 'Good Job !!',
       duration: 2000,
       mask: true
     });
-    user && !this.data.shareUserId && this.setData({
+    // 一个人玩
+    !this.data.shareUserId && user && this.setData({
       listScore: [this.getCurUserScore()]
     });
+    // 没有个人信息
     !user && wx.showToast({
       title: "　　获取认证信息失败，删除小程序后重新打开可进行授权。　",
       duration: 5000,
@@ -475,9 +475,9 @@ Page({
     })
   },
   // 根据openId获取群聊游戏成绩
-  getGroupScore (groupId) {
+  getGroupScore(groupId) {
     const lastReqTime = this.getGroupScore.lastReqTime;
-    if (+new Date - lastReqTime < 15 * 1000) return;
+    if (+new Date - lastReqTime < 3 * 1000) return;
     this.getGroupScore.lastReqTime = +new Date;
     const reqUrl = 'https://bala.so/wxapp/getScoreByGroup?groupId=' + groupId
     wx.request({
