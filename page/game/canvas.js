@@ -31,6 +31,19 @@ let mockPlaying;
 let endGameAction;
 let canStartGame = true;
 
+const hanzs = {
+  '1': '一',
+  '2': '二',
+  '3': '三',
+  '4': '四',
+  '5': '五',
+  '6': '六',
+  '7': '七',
+  '8': '八',
+  '9': '九',
+  '10': '十'
+}
+
 // 游戏动画
 function draw() {
   if (!ctx) return;
@@ -53,10 +66,13 @@ function draw() {
   ctx.fill();
 
   // 显示分数
-  ctx.setFillStyle('#0a8888')
-  ctx.setFontSize(15)
-  ctx.setTextAlign('center')
-  ctx.fillText(actionData.length + '', 20, 28)
+  let _level = 2 + Math.floor((actionData.length + 1 - 2) / (levelUpLimit + 1)) // 缺少endData
+  let _score = actionData.length + 1
+  let _scoreLevel_ = _level > 2 ? ((hanzs[_level - 2] ? hanzs[_level - 2] : _level - 2) + '阶' + hanzs[(_score - 2) % 4 + 1] + '段') : '✦✦✦✦'
+  // ctx.setFillStyle('#cccccc')
+  // ctx.setFontSize(12)
+  // ctx.setTextAlign('right')
+  // ctx.fillText(, _width - 20, _width - 20)
 
   // 画外圈
   let index = 0;
@@ -90,7 +106,7 @@ function draw() {
   ctx.setFillStyle('#ffffff')
   ctx.setFontSize(15)
   ctx.setTextAlign('center')
-  let infoText = mockPlaying ? '游戏画面重放' : '指针进入同色弧形区域时点击'
+  let infoText = speed ? _scoreLevel_ : (mockPlaying ? '游戏画面重放' : '指针进入同色弧形区域时点击')
   ctx.fillText(infoText, center, 2 * center + offsetTop * 1.8)
 
   // 计算当前指针位置对应外圈颜色序号
@@ -190,19 +206,6 @@ const mockListScore = [
   //   score: 6
   // }
 ]
-
-const hanzs = {
-  '1': '一',
-  '2': '二',
-  '3': '三',
-  '4': '四',
-  '5': '五',
-  '6': '六',
-  '7': '七',
-  '8': '八',
-  '9': '九',
-  '10': '十'
-}
 
 // 定义页面内容
 Page({
