@@ -1,10 +1,10 @@
 {
   "pages": [
-    "page/game/canvas"
+    "page/canvas/index"
   ],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "演示",
+    "navigationBarTitleText": "杰作互动",
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#ffffff"
   },
