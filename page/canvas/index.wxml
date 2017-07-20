@@ -26,13 +26,13 @@
   </scroll-view>
   <view class="smile-face" hidden="{{!showGame}}">
     <view class="page-body">
-          <canvas class="canvas" canvas-id="myCanvas"
-            style="margin: 0; border: none; background-image: url({{bgImageSrc}}); background-size: cover"
-            bindtouchstart="tap"
-            bindtouchmove="noop"
-            bindtouchend="noop"
-            disable-scroll="{{true}}"
-          />
+      <canvas class="canvas" canvas-id="myCanvas"
+        style="margin: 0; border: none; background-image: url({{bgImageSrc}}); background-size: cover"
+        bindtouchstart="tap"
+        bindtouchmove="noop"
+        bindtouchend="noop"
+        disable-scroll="{{true}}"
+      />
     </view>
     <scroll-view scroll-y="hidden" style="background: #ffffff; height: {{scrollHeight}}px;" >
       <view class="pkInfo">

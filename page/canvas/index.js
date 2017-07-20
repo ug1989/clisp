@@ -625,7 +625,7 @@ Page({
       url: notifyUrl,
       method: 'POST',
       data: {
-        page: '/page/test/index',
+        page: '/page/canvas/index',
         user: user,
         formId: form_id
       },
