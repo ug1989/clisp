@@ -213,7 +213,7 @@ const mockListScore = [
 function getSuggest() {
   let _c;
   const _s = [];
-  while(_s.length < 9) {
+  while(_s.length < 12) {
     _c = Math.floor(Math.random() * pokerColorsArr.length)
     _s.indexOf(_c) == -1 && _s.push(_c)
   }
@@ -233,22 +233,18 @@ Page({
     coverView: wx.canIUse('cover-view'),
     pokerColors: pokerColorsArr,
     pokerColorsMatchs: getSuggest(),
+    pokerColorsIndex: '',
     bgImageSrc: ''
   },
   filterColor(e) {
     const inputValue = e.detail && e.detail.value && e.detail.value.trim()
     if (!inputValue) {
       this.setData({
-        pokerColorsMatchs: []
+        searchKey: '',
+        pokerColorsMatchs: getSuggest()
       })
       return
     }
-    clearTimeout(this.filterColor.timer)
-    wx.showToast({
-      title: 'loading..',
-      icon: 'loading',
-      duration: 500
-    })
     const matchs = []
     pokerColorsArr.map((colorObj, index) => {
       const matchName = colorObj.colorName && colorObj.colorName.toLowerCase().indexOf(inputValue.toLowerCase()) != -1;
@@ -257,11 +253,22 @@ Page({
         matchs.push(index)
       }
     })
-    this.filterColor.timer = setTimeout(() => {
-      this.setData({
-        pokerColorsMatchs: matchs
-      })
-    }, 450)
+    this.setData({
+      searchKey: inputValue,
+      pokerColorsMatchs: matchs
+    })
+  },
+  randomNew() {
+    this.setData({
+      pokerColorsMatchs: getSuggest()
+    })
+  },
+  swipeColor(e) {
+    return;
+    let index = e && e.target && e.target.id || ''
+    this.setData({
+      pokerColorsIndex: index
+    });
   },
   tap(e) {
     // 重现游戏中
@@ -352,62 +359,78 @@ Page({
     });
   },
   playShow() {
-    const _this = this;
-    const bestScoreStr = wx.getStorageSync('bestScore');
-    const _actionData = bestScoreStr && JSON.parse(bestScoreStr) || [];
-    actionData.length = 0;
-    _actionData.map(_ => actionData.push(_));
-    if (actionData.length < 2 || speed) return;
-    // 重置动画变量
-    speed = initSpeed;
-    _angle = 0;
-    direction = 1;
-    catchMatchColor = false;
-    colors = actionData[0].colors;
-    curColor = actionData[0].curColor;
-    mockPlaying = true; // 阻止点击影响重现
-    clearInterval(mockPlay);
-    startGame();
-    _gameLevel = 1;
-    _gameTap = 0;
-    let mockIndex = 1;
-    let mockPlay = setInterval(() => {
-      if (!actionData[mockIndex]) {
-        clearInterval(mockPlay);
-        return
-      }
-      const stopMock = actionData[mockIndex].stop;
-      const matchAngle = _angle == actionData[mockIndex]._angle;
-      // 模拟反转
-      if (actionData[mockIndex] && matchAngle && !stopMock) {
-        direction *= -1;
-        catchMatchColor = false;
-        colors = actionData[mockIndex].colors;
-        curColor = actionData[mockIndex].curColor;
-        _gameLevel = Math.floor(mockIndex / (levelUpLimit + 1)) + 1;
-        _gameTap = mockIndex % (levelUpLimit + 1);
-        mockIndex += 1;
-      }
-      // 模拟停止
-      if (speed == 0 || matchAngle && stopMock) {
-        speed = 0;
-        endGame();
-        clearInterval(mockPlay);
-      }
-    }, drawTimeStop);
+    // const _this = this;
+    // const bestScoreStr = wx.getStorageSync('bestScore');
+    // const _actionData = bestScoreStr && JSON.parse(bestScoreStr) || [];
+    // actionData.length = 0;
+    // _actionData.map(_ => actionData.push(_));
+    // if (actionData.length < 2 || speed) return;
+    // // 重置动画变量
+    // speed = initSpeed;
+    // _angle = 0;
+    // direction = 1;
+    // catchMatchColor = false;
+    // colors = actionData[0].colors;
+    // curColor = actionData[0].curColor;
+    // mockPlaying = true; // 阻止点击影响重现
+    // clearInterval(mockPlay);
+    // startGame();
+    // _gameLevel = 1;
+    // _gameTap = 0;
+    // let mockIndex = 1;
+    // let mockPlay = setInterval(() => {
+    //   if (!actionData[mockIndex]) {
+    //     clearInterval(mockPlay);
+    //     return
+    //   }
+    //   const stopMock = actionData[mockIndex].stop;
+    //   const matchAngle = _angle == actionData[mockIndex]._angle;
+    //   // 模拟反转
+    //   if (actionData[mockIndex] && matchAngle && !stopMock) {
+    //     direction *= -1;
+    //     catchMatchColor = false;
+    //     colors = actionData[mockIndex].colors;
+    //     curColor = actionData[mockIndex].curColor;
+    //     _gameLevel = Math.floor(mockIndex / (levelUpLimit + 1)) + 1;
+    //     _gameTap = mockIndex % (levelUpLimit + 1);
+    //     mockIndex += 1;
+    //   }
+    //   // 模拟停止
+    //   if (speed == 0 || matchAngle && stopMock) {
+    //     speed = 0;
+    //     endGame();
+    //     clearInterval(mockPlay);
+    //   }
+    // }, drawTimeStop);
   },
   updateScore(timeTake) {
     const lastScore = wx.getStorageSync('score')
     const appInfo = getApp().globalData
-    if (actionData.length < Math.max(lastScore, 4)) {
+    const user = appInfo.user
+    // 分数太低、无个人信息
+    if (!user || actionData.length < 4) {
+      _angle && this.setData({
+        showReInstall: !user,
+        showComeOn: user && actionData.length < 4,
+        showGreat: false,
+        showWelcome: false
+      });
+      return;
+    }
+    // 展示鼓励分享按钮
+    this.setData({
+      showComeOn: false,
+      showGreat: actionData.length > lastScore,
+      showWelcome: false
+    });
+    // 低于以往最佳成绩，更新群成绩
+    if (actionData.length < lastScore) {
       _angle && appInfo.openGId && this.getGroupScore(appInfo.openGId);
       return;
     }
-    // 记录最新成绩
-    wx.setStorageSync('score', actionData.length)
-    // 上传游戏得分
+    wx.setStorageSync('score', actionData.length);
+    // 上传得分、更新成绩
     const updateUrl = 'https://bala.so/wxapp/updateScore'
-    const user = appInfo.user
     user && wx.request({
       url: updateUrl,
       method: 'POST',
@@ -416,39 +439,33 @@ Page({
         user: user
       },
       success: (res) => {
-        wx.setStorage({
-          key: 'bestScore',
-          data: JSON.stringify(res.data.data),
-        })
-        appInfo.bestScore = res.data.data
+        // 更新最好成绩
+        if (!res || !res.data || !res.data.data) return;
+        wx.setStorageSync('score', res.data.data.length)
+        // wx.setStorage({
+        //   key: 'bestScore',
+        //   data: JSON.stringify(res.data.data),
+        // })
+        // appInfo.bestScore = res.data.data
+        // 一个人玩
+        !this.data.shareUserId && user && this.getCurUserScore() && this.setData({
+          listScore: [this.getCurUserScore()]
+        });
       },
       complete: () => {
-        const appInfo = getApp().globalData
+        // 获取最新排名
         appInfo.openGId ? this.getGroupScore(appInfo.openGId) : this.data.shareUserId && this.getShareInfo(this.data.shareUserId)
       }
     });
-    // 新记录提示
-    user && wx.showToast({
-      title: 'Good Job !!',
-      duration: 2000,
-      mask: true
-    });
     // 一个人玩
-    !this.data.shareUserId && user && this.setData({
+    !this.data.shareUserId && user && this.getCurUserScore() && this.setData({
       listScore: [this.getCurUserScore()]
-    });
-    // 没有个人信息
-    !user && wx.showToast({
-      title: "　　获取认证信息失败，删除小程序后重新打开可进行授权。　",
-      duration: 5000,
-      image: '../../image/fe.png',
-      mask: true
     });
   },
   getCurUserScore() {
     const appInfo = getApp().globalData
     const lastScore = wx.getStorageSync('score')
-    const mockUserScore = {
+    const mockUserScore = lastScore && {
       user: appInfo.user,
       level: lastScore && (2 + Math.floor((lastScore - 2) / (levelUpLimit + 1))),
       score: lastScore
@@ -459,19 +476,20 @@ Page({
     const appInfo = getApp().globalData
     const shareUserId = option && option.id
     const setCurUserBest = () => {
-      this.setData({
+      this.getCurUserScore() ? this.setData({
         listScore: [this.getCurUserScore()]
+      }) : this.setData({
+        showWelcome: true
       })
     }
     this.data.shareUserId = shareUserId
     this.data.openGId = appInfo.openGId
-    shareUserId ? this.getShareInfo(shareUserId) : appInfo.user ? setCurUserBest() : appInfo.getInfoWithUserId = setCurUserBest
     // bind updateScore when endGame
     endGameAction = this.updateScore && this.updateScore.bind(this)
+    // get shareInfo or local user data
+    shareUserId ? this.getShareInfo(shareUserId) : appInfo.user ? setCurUserBest() : appInfo.getInfoWithUserId = setCurUserBest
     // openGId 直接获取，不然等到获取信息后在获取
-    appInfo.openGId
-      ? this.getGroupScore(appInfo.openGId)
-      : appInfo.getInfoWithGId = this.getGroupScore.bind(this)
+    appInfo.openGId ? this.getGroupScore(appInfo.openGId) : appInfo.getInfoWithGId = this.getGroupScore.bind(this)
     // 指定标记分享
     wx.showShareMenu && wx.showShareMenu({
       withShareTicket: true
@@ -480,18 +498,25 @@ Page({
     ctx = wx.createCanvasContext('myCanvas')
     this.freeStart()
     this.trySmileFromServer();
+    // 初始化标题
+    wx.getStorageSync('showGame') && wx.setNavigationBarTitle({
+      title: '眼疾手快'
+    })
   },
   // 从服务器获取是否展示game
   trySmileFromServer() {
     const user = getApp().globalData.user
     wx.request({
-      url: 'https://bala.so/wxapp/freeGame',
+      url: 'https://bala.so/wxapp/initData',
       success: (res) => {
-        const showGame = user && user.avatarUrl && res.data && res.data.showGame
+        if (!res || !res.data) return;
+        const showGame = user && user.avatarUrl && res.data.showGame
         wx.setStorageSync('showGame', showGame)
         this.setData({
-          showGame: res.data && res.data.showGame,
-          bgImageSrc: res.data && res.data.bgImageSrc
+          showGame: res.data.showGame,
+          greatSrc: res.data.greatSrc,
+          comeOnSrc: res.data.comeOnSrc,
+          bgImageSrc: res.data.bgImageSrc
         })
         showGame && wx.setNavigationBarTitle({
           title: '眼疾手快'
@@ -525,7 +550,7 @@ Page({
           const diffUser = curUserScore && curUserScore.user._id != res.data.user._id
           res.data.user && (res.data.level = 2 + Math.floor((res.data.score - 2) / (levelUpLimit + 1)))
           const listScores = [res.data];
-          diffUser && listScores.push(curUserScore);
+          diffUser && curUserScore && listScores.push(curUserScore);
           listScores.map(_ => {
             _.user && (_.level = 2 + Math.floor((_.score - 2) / (levelUpLimit + 1)))
           });
@@ -578,24 +603,15 @@ Page({
     })
   },
   onShareAppMessage(res) {
-    let _shareId, _shareUser
-    if (res.from === 'button') {
-      _shareId = res.target && res.target.id
-      _shareId && this.data.listScore.map(_ => {
-        _.user && _.user._id == _shareId && (_shareUser = _.user);
-      })
-    }
     const user = getApp().globalData.user
-    let shareTitle = (_shareUser && user._id != _shareUser._id ? user.nickName + '携手' + _shareUser.nickName : user.nickName) + '邀你一起《眼疾手快》';
-    shareTitle = this.data.showGame ? shareTitle : "设计师常用颜色查询";
+    let shareTitle = this.data.showGame ? "来，一起挑战《眼疾手快》" : "设计师常用颜色查询";
     return {
       title: shareTitle,
-      path: '/page/canvas/index?id=' + user._id,
+      path: '/page/canvas/index?id=' + (user && user._id || ''),
       success: (res) => {
         const saveTicketUrl = 'https://bala.so/wxapp/saveShareTicket'
-        const shareTicket = res.shareTickets[0]
-        const user = getApp().globalData.user
-        if (!shareTicket || !user) return
+        const shareTicket = res && res.shareTickets && res.shareTickets[0]
+        if (!shareTicket) return
         wx.request({
           url: saveTicketUrl,
           method: 'POST',
@@ -629,8 +645,11 @@ Page({
         user: user,
         formId: form_id
       },
-      success: function (res) {
-        console.log(res)
+      success: (res) => {
+        this.setData({
+          showGreat: false,
+          showComeOn: false
+        })
       }
     })
   },

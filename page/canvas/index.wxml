@@ -13,13 +13,29 @@
     <scroll-view scroll-y="true" class="matchColors" hidden="{{matchColors.length == 0}}">
       <view class="pokerColorList" wx:for="{{pokerColorsMatchs}}" wx:key="pokerMatchColors" wx:for-index="idc" wx:for-item="item">
         <view bindtap="swipeColor" id="{{item}}" class="pokerColorItem" style="background: {{pokerColors[item]['colorName']}}">
-        <text>
-          {{pokerColors[item]["colorName"]}}
+        <text> 
+          {{pokerColors[item]["colorName"]}} 
           {{pokerColors[item]["colorNameCN"]}}
         </text>
         </view>
       </view>
+      <button class="randomNew" bindtap="randomNew" hidden="{{searchKey && (pokerColorsMatchs.length > 0)}}">切换一批颜色</button>
     </scroll-view>
+    <view bindtap="swipeColor" class="pokerColorsIndex" wx:if="{{pokerColorsIndex}}">
+      <view class="pokerColorItemIndex" style="background: {{pokerColors[pokerColorsIndex]['colorName']}}">
+        <text>
+          {{pokerColors[pokerColorsIndex]["colorNum"]}} 
+        </text>
+        <view class="line"></view>
+        <text>
+          {{pokerColors[pokerColorsIndex]["colorName"]}}
+        </text>
+        <view class="line"></view>
+        <text> 
+          {{pokerColors[pokerColorsIndex]["colorNameCN"]}}
+        </text>
+      </view>
+    </view>
     <view class="emptyMsg" hidden="{{pokerColorsMatchs.length > 0}}">
       未找到匹配颜色
     </view>
@@ -35,8 +51,31 @@
       />
     </view>
     <scroll-view scroll-y="hidden" style="background: #ffffff; height: {{scrollHeight}}px;" >
-      <view class="pkInfo">
-        <view class="pkItem" wx:for="{{listScore}}" wx:key="listScore" wx:for-index="idx" wx:for-item="item">
+      <!-- 重新授权说明 -->
+      <view class="reInstall" wx:if="{{showReInstall}}">
+        <view class="reInstallLogo">
+          <image class="" src="../../image/fe.png"></image>
+        </view>
+        <view class="reInstallInfo">
+          <text>未获得你的授权信息，无法进行排名哦！删除小程序后重新打开可重新授权。</text>
+        </view>
+      </view>
+      <!-- 低分鼓励 -->
+      <view class="comeOn" wx:if="{{(showComeOn || showWelcome) && comeOnSrc}}" style="height: {{scrollHeight}}px;">
+        <image src="{{comeOnSrc}}" mode="aspectFit" ></image>
+        <text>加油，创造一个别人无法企及的成绩吧！</text>
+      </view>
+      <!-- 高分赞扬 -->
+      <view class="great" wx:if="{{showGreat}}" style="height: {{scrollHeight}}px;">
+        <image src="{{greatSrc}}" mode="aspectFit" wx:if="{{greatSrc}}"></image>
+        <form bindsubmit="notifyInfo" report-submit="true" class="menu">
+          <button bindtap="sharePrevent" class="pkShare" id="great_{{item.user && item.user._id}}" formType="submit" open-type="share"></button>
+          <text class="shareText">炫耀战绩！</text>
+        </form>
+      </view>
+      <!-- 成绩排行 -->
+      <view class="pkInfo" wx:if="{{!showGreat && !showComeOn}}">
+        <view class="pkItem {{idx == listScore.length - 1 ? 'hiddenBottom' : ''}}" wx:for="{{listScore}}" wx:key="listScore" wx:for-index="idx" wx:for-item="item">
           <view class="pkIndex">
             <text style="background: {{allColors[item.level] || 'gold'}}">NO. {{idx + 1}}</text>
           </view>
@@ -56,10 +95,10 @@
             </view>
           </view>
         </view>
-        <view class="shareButton" hidden="{{listScore.length == 0}}">
+        <view class="shareButton" wx:if="{{!showGreat}}">
           <form bindsubmit="notifyInfo" report-submit="true" class="menu">
             <button bindtap="sharePrevent" class="pkShare" id="{{item.user && item.user._id}}" formType="submit" open-type="share"></button>
-            <image class="shareImage" style="background: teal" mode="aspectFill" src="../../image/share.png"></image>
+            <image class="shareImage" mode="aspectFill" src="../../image/share.png"></image>
           </form>
         </view>
       </view>
