@@ -49,6 +49,6 @@ Page({
     },
     toDetailPage: function(event) {
         const id = event.currentTarget.dataset.detailId
-        wx.redirectTo({ url: `/page/detail/index?id=${id}` })
+        wx.navigateTo({ url: `/page/detail/index?id=${id}` })
     }
 });
