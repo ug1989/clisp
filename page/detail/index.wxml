@@ -1,0 +1,23 @@
+<view class="container">
+  <view class="page-body">
+    <view class="content">
+      asdjhaskdjasjkgdsjka
+      <view class="mask {{showGoods ? '' : 'hidden'}}" bindtap="toggleGoodsList"></view>
+    </view>
+    <view class="goods {{showGoods ? '' : 'hidden'}}">
+      <view class="goods-title">
+        <text>点击商品可获取购买链接</text>
+        <view class="close"></view>
+      </view>
+      <scroll-view scroll-y	class="goods-list">
+        <block wx:for="{{goodsList}}" wx:key="{{item.id || index}}">
+          <view class="goods-item">
+            <image src="{{item.imgSrc}}" class="goods-image" mode="scaleToFill" />
+            <view class="goods-title">{{item.title}}</view>
+            <view class="goods-price">{{item.price}}</view>
+          </view>
+        </block>
+      </scroll-view>
+    </view>
+  </view>
+</view>

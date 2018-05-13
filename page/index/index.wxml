@@ -1,0 +1,25 @@
+<scroll-view scroll-y class="container" bindscrolltolower="loadMoreContent">
+  <view class="page-body">
+    <swiper class="swiper-list" indicator-dots="{{true}}" autoplay="{{true}}" duration="{{300}}">
+      <block wx:for="{{swiperList}}" wx:key="{{item.id || index}}">
+        <swiper-item bindtap="toDetailPage" data-detail-id="{{item.id || index}}">
+          <image src="{{item.imgSrc}}" class="slide-image" mode="scaleToFill" />
+          <view class="swiper-description">
+            <view class="swiper-title">{{item.title}}</view>
+            <view class="swiper-summary">{{item.summary}}</view>
+          </view>
+        </swiper-item>
+      </block>
+    </swiper>
+    <view class="content-list">
+      <block wx:for="{{contentList}}" wx:key="{{item.id || index}}">
+        <view class="content-item">
+          <image src="{{item.imgSrc}}" width="355" height="150"/>
+          <view>{{item.title}}</view>
+          <view>{{item.summary}}</view>
+        </view>
+      </block>
+    </view>
+    <view class="loadingMore {{loadingMore ? '' : 'hidden'}}">正在加载...</view>
+  </view>
+</scroll-view>

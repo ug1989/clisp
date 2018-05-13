@@ -1,11 +1,9 @@
-const loginFailInfo = function() {
-  const alertMsg = "　　获取登录信息失败！如需登录，删除小程序重新打开进行授权。"
-  wx.showModal({
-    content: alertMsg,
-    showCancel: false,
-    confirmText: "确定"
-  })
-}
+import util from './util/util'
+
+const loginFailInfo = () => util.showMsgModal("获取认证信息失败！重启微信尝试重新认证。");
+
+const supportRichText = wx.canIUse('rich-text');
+if (!supportRichText) util.showMsgModal("您的微信版本过低，小程序的部分功能可能无法正常使用，请更新微信。");
 
 App({
   globalData: {},
@@ -30,40 +28,15 @@ App({
     wx.login({
       success: function (res) {
         const loginUrl = 'https://bala.so/wxapp/login'
-        !res.code ? loginFailInfo() : wx.request({
+        res.code ? wx.request({
           url: loginUrl,
-          data: {
-            code: res.code
-          },
+          data: { code: res.code },
           success: function (res) {
-            const userId = res.data && res.data.userId
-            _this.globalData.userId = userId
-            // 获取用户信息，头像、昵称等
-            userId && wx.getUserInfo({
-              success: function (res) {
-                // 校验用户信息，通过验证hashed信息确认信息来自微信
-                const verifyLoginUrl = 'https://bala.so/wxapp/loginCheck'
-                wx.request({
-                  url: verifyLoginUrl,
-                  data: {
-                    userId: userId,
-                    rawData: res.rawData,
-                    signature: res.signature
-                  },
-                  method: 'POST',
-                  success: function (res) {
-                    if (res.data) {
-                      wx.setStorageSync('user', res.data)
-                      _this.globalData.user = res.data
-                      appInfo.getInfoWithUserId && appInfo.getInfoWithUserId()
-                      _this.joinGroup()
-                    }
-                  }
-                })
-              }
-            })
+            const { errMsg, data = {} } = res;
+            appInfo.user = errMsg == "request:ok" ? data : null
+            appInfo.user && wx.setStorageSync('user', appInfo.user)
           }
-        })
+        }) : loginFailInfo()
       },
       fail: loginFailInfo
     })
@@ -76,7 +49,7 @@ App({
       shareTicket: shareTicket,
       success: function(res) {
         const uploadGroupUrl = 'https://bala.so/wxapp/saveGroupInfo'
-        res.userId = appInfo.userId || appInfo.user._id
+        res.userId = appInfo.user && appInfo.user.userId
         wx.request({
           url: uploadGroupUrl,
           data: res,

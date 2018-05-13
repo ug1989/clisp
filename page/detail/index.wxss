@@ -1,0 +1,33 @@
+.content {
+  background: red;
+}
+.mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.2);
+}
+/* goods list */
+.goods {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 45vh;
+  background: white;
+}
+.goods-title {
+  height: 32px;
+  text-align: center;
+}
+.goods-list {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  padding-top: 32px;
+  box-sizing: border-box;
+}

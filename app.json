@@ -1,6 +1,7 @@
 {
   "pages": [
-    "page/canvas/index"
+    "page/index/index",
+    "page/detail/index"
   ],
   "window": {
     "navigationBarTextStyle": "black",

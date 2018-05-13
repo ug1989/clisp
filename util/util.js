@@ -50,8 +50,20 @@ function uploadFile(filePath, callback) {
   })
 }
 
+function showMsgModal(msg) {
+  wx.showModal({
+    content: msg,
+    showCancel: false,
+    confirmText: "确定"
+  })
+}
+
+function noop() {}
+
 module.exports = {
-  uploadFile: uploadFile,
-  formatTime: formatTime,
-  formatLocation: formatLocation
+  noop,
+  uploadFile,
+  formatTime,
+  showMsgModal,
+  formatLocation
 }
