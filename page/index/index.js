@@ -28,6 +28,12 @@ const mockContentList = [
     }
 ];
 
+/*
+    cache data to localStorage
+    show localData and request new Data
+    replace cache data when new data fetched
+*/
+
 Page({
     data: {
         swiperList: mockSwiperList || [],
